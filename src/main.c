@@ -19,6 +19,7 @@ void setID(struct Token* token, const char* id) {
 		}
 		memSize += BLOCK_SIZE;
 	}
+	strcpy((char*)(mem + offset), id);
 	token->id = offset;
 	offset += strlen(id);
 }
