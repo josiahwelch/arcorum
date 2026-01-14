@@ -32,9 +32,6 @@ int main(int argc, char *argv[]) {
 	mem = malloc(BLOCK_SIZE);
 	memSize = BLOCK_SIZE;
 	offset = 0;
-	struct Token token;
-	setID(&token, "I am testing this really really hard rn. I just need a long enough string to force a realloc...");
-	printf("%s\n", getID(&token));
 }
 
 
