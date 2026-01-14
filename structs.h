@@ -20,6 +20,6 @@ enum TokenType {
 struct Token {
 	enum TokenCat category;
 	enum TokenType type;
-	char *id; // Storing as pointer to improve memory efficiency
-	char *value; // Storing as pointer to improve memory efficiency
+	uint16_t id; // Storing as offsets to improve memory efficiency
+	uint16_t value; // Storing as offsets to improve memory efficiency
 }
