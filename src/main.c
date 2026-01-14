@@ -1,17 +1,22 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include "structs.h"
 
-#define BLOCK_SIZE 16
+const size_t BLOCK_SIZE = 16;
 
-char* mem;
+void* mem;
+void* memBuf;
 size_t memSize;
 uint16_t offset;
 
 void setID(struct Token* token, const char* id) {
 	while (offset + strlen(id) >= memSize) {
-		mem = (char*) realloc(mem, memSize + BLOCK_SIZE);
+		if ((memBuf = realloc(mem, memSize + BLOCK_SIZE)) != NULL) {mem = memBuf;}
+		else {
+			printf("MEMORY ERROR!\n");
+		}
 		memSize += BLOCK_SIZE;
 	}
 	token->id = offset;
@@ -23,7 +28,7 @@ char* getID(struct Token* token) {
 }
 
 int main(int argc, char *argv[]) {
-	mem = (char*) malloc(BLOCK_SIZE);
+	mem = malloc(BLOCK_SIZE);
 	memSize = BLOCK_SIZE;
 	offset = 0;
 	struct Token token;
