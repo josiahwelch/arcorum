@@ -24,8 +24,25 @@ void setID(struct Token* token, const char* id) {
 	offset += strlen(id);
 }
 
+void setValue(struct Token* token, const char* value) {
+	while (offset + strlen(value) >= memSize) {
+		if ((memBuf = realloc(mem, memSize + BLOCK_SIZE)) != NULL) {mem = memBuf;}
+		else {
+			printf("MEMORY ERROR!\n");
+		}
+		memSize += BLOCK_SIZE;
+	}
+	strcpy((char*)(mem + offset), value);
+	token->value = offset;
+	offset += strlen(value);
+}
+
 char* getID(struct Token* token) {
 	return mem + token->id;
+}
+
+char* getValue(struct Token* token) {
+	return mem + token->value;
 }
 
 int main(int argc, char *argv[]) {
