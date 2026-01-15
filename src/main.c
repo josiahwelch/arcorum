@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "structs.h"
+#include "lexer.h"
 
 const size_t BLOCK_SIZE = 16;
 
@@ -49,6 +50,5 @@ int main(int argc, char *argv[]) {
 	mem = malloc(BLOCK_SIZE);
 	memSize = BLOCK_SIZE;
 	offset = 0;
+	test();
 }
-
-
