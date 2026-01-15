@@ -17,7 +17,33 @@ void test() {
 	printf("%s: %s\n", getID(&otherToken), getValue(&otherToken));
 }
 
+bool is_num(const char c) {
+	if (c < '0' || c > '9') {
+		return false;
+	}
+	return true;
+}
 
+bool is_alpha(const char c) {
+	if ((c < 'A' || c > 'Z') && (c < 'a' || c > 'z')) {
+		return false;
+	}
+	return true;
+}
+
+bool is_bin(const char c) {
+	if (c != '0' || c != '1') {
+		return false;
+	}
+	reurn true;
+}
+
+bool is_hex(const char c) {
+	if ((c < '0' || c > '9') && (c < 'A' || c > 'F') && (c < 'a' || c > 'f')) {
+		return false;
+	}
+	return true;
+}
 
 Token* lex(const char* prog) {
 	uint16_t bufSize = 16;
