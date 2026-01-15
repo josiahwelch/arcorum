@@ -7,8 +7,8 @@
 
 const size_t BLOCK_SIZE = 16;
 
-void* mem;
-void* memBuf;
+char* mem;
+char* memBuf;
 size_t memSize;
 uint16_t offset;
 
@@ -21,8 +21,9 @@ void setID(struct Token* token, const char* id) {
 		memSize += BLOCK_SIZE;
 	}
 	strcpy((char*)(mem + offset), id);
+	mem[offset + strlen(id)] = '\0';
 	token->id = offset;
-	offset += strlen(id);
+	offset += strlen(id) + 1;
 }
 
 void setValue(struct Token* token, const char* value) {
@@ -34,8 +35,9 @@ void setValue(struct Token* token, const char* value) {
 		memSize += BLOCK_SIZE;
 	}
 	strcpy((char*)(mem + offset), value);
+	mem[offset + strlen(value)] = '\0';
 	token->value = offset;
-	offset += strlen(value);
+	offset += strlen(value) + 1;
 }
 
 char* getID(struct Token* token) {
