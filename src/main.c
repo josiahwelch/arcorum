@@ -12,7 +12,7 @@ char* memBuf;
 size_t memSize;
 uint16_t offset;
 
-void setID(struct Token* token, const char* id) {
+void setID(Token* token, const char* id) {
 	while (offset + strlen(id) >= memSize) {
 		if ((memBuf = realloc(mem, memSize + BLOCK_SIZE)) != NULL) {mem = memBuf;}
 		else {
@@ -26,7 +26,7 @@ void setID(struct Token* token, const char* id) {
 	offset += strlen(id) + 1;
 }
 
-void setValue(struct Token* token, const char* value) {
+void setValue(Token* token, const char* value) {
 	while (offset + strlen(value) >= memSize) {
 		if ((memBuf = realloc(mem, memSize + BLOCK_SIZE)) != NULL) {mem = memBuf;}
 		else {
@@ -40,11 +40,11 @@ void setValue(struct Token* token, const char* value) {
 	offset += strlen(value) + 1;
 }
 
-char* getID(struct Token* token) {
+char* getID(Token* token) {
 	return mem + token->id;
 }
 
-char* getValue(struct Token* token) {
+char* getValue(Token* token) {
 	return mem + token->value;
 }
 

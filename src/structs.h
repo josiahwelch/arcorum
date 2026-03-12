@@ -18,8 +18,8 @@ typedef enum {
 } TokenType;
 
 typedef struct {
-	enum TokenCat category;
-	enum TokenType type;
+	TokenCat category;
+	TokenType type;
 	uint16_t id; // Storing as offsets to improve memory efficiency
 	uint16_t value; // Storing as offsets to improve memory efficiency
 } Token;

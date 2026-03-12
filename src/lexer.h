@@ -1,14 +1,14 @@
 #include <stdbool.h>
 
-void setID(struct Token* token, const char* id);
-void setValue(struct Token* token, const char* value);
-char* getID(struct Token* token);
-char* getValue(struct Token* token);
+void setID(Token* token, const char* id);
+void setValue(Token* token, const char* value);
+char* getID(Token* token);
+char* getValue(Token* token);
 const size_t BLOCK_SIZE;
 
 void test() {
-	struct Token token;
-	struct Token otherToken;
+	Token token;
+	Token otherToken;
 	setID(&token, "test");
 	setValue(&token, "value");
 	setID(&otherToken, "other test");
