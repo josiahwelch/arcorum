@@ -51,5 +51,6 @@ Token* lex(const char* prog) {
 	for (int i=0;i<strlen(prog);i++) {
 		buf[strlen(buf)] = prog[i];
 		if (strlen(buf) >= bufSize - 1) {
-			buf = realloc(bufSize + strlen(buf)* 2);
+			buf = realloc(bufSize + strlen(buf)); // Exponentially increases the size of buf
+			bufSize += strlen(buf);
 		}
