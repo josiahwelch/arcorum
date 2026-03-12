@@ -1,13 +1,13 @@
-enum TokenCat {
+typedef enum {
 	KEYWORD,
 	IDENTIFIER,
 	CONSTANT,
 	OPERATOR,
 	BRACKET,
 	SEPARATOR
-};
+} TokenCat;
 
-enum TokenType {
+typedef enum {
 	STR,
 	INT,
 	FLT,
@@ -15,11 +15,11 @@ enum TokenType {
 	LOG,
 	CMP,
 	MAT
-};
+} TokenType;
 
-struct Token {
+typedef struct {
 	enum TokenCat category;
 	enum TokenType type;
 	uint16_t id; // Storing as offsets to improve memory efficiency
 	uint16_t value; // Storing as offsets to improve memory efficiency
-};
+} Token;
