@@ -48,6 +48,13 @@ char* getValue(Token* token) {
 	return mem + token->value;
 }
 
+Token createToken(const char* id, const char* value) {
+	Token token;
+	setID(&token, id);
+	setValue(&token, value);
+	return token;
+}
+
 int main(int argc, char *argv[]) {
 	mem = malloc(BLOCK_SIZE);
 	memSize = BLOCK_SIZE;
