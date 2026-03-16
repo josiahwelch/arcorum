@@ -23,3 +23,10 @@ typedef struct {
 	uint16_t id; // Storing as offsets to improve memory efficiency
 	uint16_t value; // Storing as offsets to improve memory efficiency
 } Token;
+
+typedef enum {
+	OK,
+	LEXER_ERROR,
+	PARSER_ERROR,
+	MISC_ERROR
+} returnType;
