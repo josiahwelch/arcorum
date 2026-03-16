@@ -45,8 +45,15 @@ bool is_hex(const char c) {
 	return true;
 }
 
-Token* lex(const char* prog) {
-	uint16_t bufSize = 16;
+
+
+Token* lex(Token* tokens, const char* prog) {
+	const uint8_t BUFFER_BLOCK_MULTIPLIER = 1;
+	const uint8_t TOKENS_BLOCK_ADDITIONAL = 8;
+
+	size_t bufSize = 16;
+	size_t tokensSize = 8;
+	uint16_t noTokens = 0;
 
 	bool num = false;
 	bool alpha = false;
@@ -54,12 +61,17 @@ Token* lex(const char* prog) {
 	bool hex = false;
 	bool str = false;
 
+	tokens = malloc(sizeof(Token) * tokensSize); // Initially allocates for 8 tokens
+
 	char* buf = malloc(bufSize);
 	for (int i=0;i<strlen(prog);i++) {
 		buf[strlen(buf)] = prog[i];
-		if (strlen(buf) >= bufSize - 1) {
-			buf = realloc(buf, bufSize + strlen(buf)); // Exponentially increases the size of buf
+		if (strlen(buf) >= bufSize - 1) { // One character size buffer
+			buf = realloc(buf, bufSize + strlen(buf) * BUFFER_BLOCK_MULTIPLIER); // Exponentially increases the size of buf
 			bufSize += strlen(buf);
+		}
+		if (noTokens >= tokensSize - 1) { // One Token size buffer
+			tokens = realloc(tokens, sizeof(tokens) + TOKENS_BLOCK_ADDITIONAL);
 		}
 		switch (strlen(buf)) {
 			case 1:
