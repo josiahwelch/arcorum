@@ -104,15 +104,18 @@ Token* lex(Token* tokens, const char* prog) {
 						} else if (!str) {
 							return LEXER_ERROR;
 						}
-						switch (buf[strlen(buf) - 1]) {
-							case '"':
-								if (buf[strlen(buf) - 2] != '\\') {
-									buf[strlen(buf) - 1] = '\0';
-								}
-								break;
+						break;
+				}
+				break;
+			default:
+				switch (buf[strlen(buf) - 1]) {
+					case '"':
+						if (buf[strlen(buf) - 2] != '\\') {
+							buf[strlen(buf) - 1] = '\0';
 						}
 						break;
 				}
+				break;
 			}
 		}
 }
