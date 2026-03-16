@@ -35,7 +35,7 @@ bool is_bin(const char c) {
 	if (c != '0' || c != '1') {
 		return false;
 	}
-	reurn true;
+	return true;
 }
 
 bool is_hex(const char c) {
@@ -58,37 +58,42 @@ Token* lex(const char* prog) {
 	for (int i=0;i<strlen(prog);i++) {
 		buf[strlen(buf)] = prog[i];
 		if (strlen(buf) >= bufSize - 1) {
-			buf = realloc(bufSize + strlen(buf)); // Exponentially increases the size of buf
+			buf = realloc(buf, bufSize + strlen(buf)); // Exponentially increases the size of buf
 			bufSize += strlen(buf);
-			switch (strlen(buf)) {
-				case 1:
-					switch (buf[0]) {
-						case '0':
-							num = true;
-							bin = true;
-							hex = true;
-							break;
-						case '"':
-							str = true;
-							break;
-					}
-					break;
-				case 2:
-					switch (buf[1]) {
-						case 'b': // Leaves bin as true...
-							num = false;
-							hex = false;
-							break;
-						case 'x': // Leaves hex as true...
-							num = false;
-							bin = false;
-							break;
-						default:
-							if (is_num(buf[1])) {
-								bin = false;
-								hex = false;
-							} else {
-
-							break;
-					}
 		}
+		switch (strlen(buf)) {
+			case 1:
+				switch (buf[0]) {
+					case '0':
+						num = true;
+						bin = true;
+						hex = true;
+						break;
+					case '"':
+						str = true;
+						strcpy(buf, "");
+						break;
+				}
+				break;
+			case 2:
+				switch (buf[1]) {
+					case 'b': // Leaves bin as true...
+						num = false;
+						hex = false;
+						break;
+					case 'x': // Leaves hex as true...
+						num = false;
+						bin = false;
+						break;
+					default:
+						if (is_num(buf[1])) {
+							bin = false;
+							hex = false;
+						} else if (!str) {
+							return LEXER_ERROR;
+						}
+						break;
+				}
+			}
+		}
+}
