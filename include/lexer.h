@@ -8,11 +8,12 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include <stdbool.h>
 
 typedef enum {
     TOK_EOF,
@@ -96,5 +97,8 @@ typedef struct {
     ssize_t value_len;
     ttype_t type;
 } token_t;
+
+/* Returns an owned TOK_EOF-terminated array, or NULL on failure. */
+token_t *lex(char *src, ssize_t len);
 
 #endif
