@@ -21,7 +21,7 @@ static int string() {
     for (;*tok_scan != '"' && tok_scan != tok_end; tok_scan++) // To ensure that there isn't a \ before the end quotation mark
         if (*tok_scan == '\\')
             tok_scan++;
-    return *tok_scan == '"';
+    return *tok_scan++ == '"'; // Increments so that it includes the closing quotation mark
 }
 
 /*
