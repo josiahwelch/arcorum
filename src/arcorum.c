@@ -6,3 +6,10 @@
  */
 
 #include <lexer.h>
+
+int main() {
+    token_t *tokens;
+    const char src[] = "\"yeller\"";
+    tokens = lex(src, strlen(src));
+    printf("%s\n", tokens[0].value);
+}
