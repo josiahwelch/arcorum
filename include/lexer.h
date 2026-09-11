@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 typedef enum {
-    TOK_EOF,
+    TOK_EOF = 1,
     TOK_INVALID,
 
     TOK_IDENTIFIER,
