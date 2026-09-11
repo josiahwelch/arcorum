@@ -8,8 +8,28 @@
 #include <lexer.h>
 
 int main() {
-    token_t *tokens;
-    const char src[] = "\"yeller\"";
-    tokens = lex(src, strlen(src));
-    printf("%s\n", tokens[0].value);
+    const char src[] = "yello \"yeller\" yup";
+    token_t *tokens = lex(src, strlen(src));
+    for (int i = 0; tokens[i].value != NULL; i++) {
+        switch (tokens[i].type) {
+            case TOK_EOF:
+                printf("EOF: %s\n", tokens[i].value);
+                break;
+            case TOK_INVALID:
+                printf("INVALID: %s\n", tokens[i].value);
+                break;
+            case TOK_INTEGER:
+                printf("INTEGER: %s\n", tokens[i].value);
+                break;
+            case TOK_FLOAT:
+                printf("FLOAT: %s\n", tokens[i].value);
+                break;
+            case TOK_STRING:
+                printf("STRING: %s\n", tokens[i].value);
+                break;
+            default:
+                printf("IDENTIFIER: %s\n", tokens[i].value);
+                break;
+        }
+    }
 }
