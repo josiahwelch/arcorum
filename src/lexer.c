@@ -24,6 +24,82 @@ static int string() {
     return *tok_scan++ == '"'; // Increments so that it includes the closing quotation mark
 }
 
+static ttype_t identifier() {
+    // Base case
+    if ((*tok_start < 'a' || *tok_start > 'z') && (*tok_start < 'A' || *tok_start > 'Z')) // First character must be alphabetical
+        return 0;
+
+    for (;*tok_scan != ' ' && *tok_scan != '\t' && *tok_scan != '\n' && *tok_scan != '\r' && *tok_scan != '\0'; tok_scan++)
+        if ((*tok_scan < 'a' || *tok_scan > 'z') && (*tok_scan < 'A' || *tok_scan > 'Z') && (*tok_scan < '0' || *tok_scan > '9')) // Rest of them must be alphanumeric
+            return 0;
+
+    switch (tok_scan - tok_start) {
+        case 2:
+            if (strncmp(tok_start, "fn", 2) == 0)
+                return TOK_FN;
+            if (strncmp(tok_start, "if", 2) == 0)
+                return TOK_IF;
+            if (strncmp(tok_start, "u8", 2) == 0)
+                return TOK_U8;
+            if (strncmp(tok_start, "i8", 2) == 0)
+                return TOK_I8;
+            break;
+        case 3:
+            if (strncmp(tok_start, "let", 3) == 0)
+                return TOK_LET;
+            if (strncmp(tok_start, "for", 3) == 0)
+                return TOK_FOR;
+            if (strncmp(tok_start, "u16", 3) == 0)
+                return TOK_U16;
+            if (strncmp(tok_start, "u32", 3) == 0)
+                return TOK_U32;
+            if (strncmp(tok_start, "u64", 3) == 0)
+                return TOK_U64;
+            if (strncmp(tok_start, "i16", 3) == 0)
+                return TOK_I16;
+            if (strncmp(tok_start, "i32", 3) == 0)
+                return TOK_I32;
+            if (strncmp(tok_start, "i64", 3) == 0)
+                return TOK_I64;
+            break;
+        case 4:
+            if (strncmp(tok_start, "else", 4) == 0)
+                return TOK_ELSE;
+            if (strncmp(tok_start, "enum", 4) == 0)
+                return TOK_ENUM;
+            if (strncmp(tok_start, "true", 4) == 0)
+                return TOK_TRUE;
+            if (strncmp(tok_start, "bool", 4) == 0)
+                return TOK_BOOL;
+            break;
+        case 5:
+            if (strncmp(tok_start, "const", 5) == 0)
+                return TOK_CONST;
+            if (strncmp(tok_start, "while", 5) == 0)
+                return TOK_WHILE;
+            if (strncmp(tok_start, "break", 5) == 0)
+                return TOK_BREAK;
+            if (strncmp(tok_start, "false", 5) == 0)
+                return TOK_FALSE;
+            break;
+        case 6:
+            if (strncmp(tok_start, "return", 6) == 0)
+                return TOK_RETURN;
+            if (strncmp(tok_start, "struct", 6) == 0)
+                return TOK_STRUCT;
+            if (strncmp(tok_start, "import", 6) == 0)
+                return TOK_IMPORT;
+            break;
+        case 8:
+            if (strncmp(tok_start, "continue", 8) == 0)
+                return TOK_CONTINUE;
+            break;
+        default:
+            break;
+    }
+            return TOK_IDENTIFIER;
+}
+
 /*
  * @param a pointer to the source char array
  * @param size of source char array
@@ -40,8 +116,12 @@ token_t *lex(char *src, ssize_t len) {
     tok_end = src + len;
 
     for (tok_scan = src; tok_scan - src < len; tok_scan++) {
-        while ((*tok_start == ' ' || *tok_start == '\t' || *tok_start == '\n') && (src - tok_start) < len)
+        // Whitespace, newline, and tab handling
+        while ((*tok_start == ' ' || *tok_start == '\t' || *tok_start == '\n' || *tok_start == '\r') && (src - tok_start) < len)
             tok_start++;
+        if ((*tok_scan == ' ' || *tok_scan == '\t' || *tok_scan == '\n' || *tok_scan == '\r') && (src - tok_scan) < len)
+            tok_start = tok_scan + 1;
+
         if (tok_scan < tok_start)
             tok_scan = tok_start;
 
@@ -53,6 +133,17 @@ token_t *lex(char *src, ssize_t len) {
             tok_start = tok_scan;
             tok_n++;
         }
+
+        // Identifier handling
+        const ttype_t id = identifier();
+        if (!!id) {
+            tokens[tok_n].value = malloc(tok_scan - tok_start + 1);
+            strncpy(tokens[tok_n].value, tok_start, tok_scan - tok_start);
+            tokens[tok_n].type = id;
+            tok_start = tok_scan;
+            tok_n++;
+        }
+
     }
 
     return tokens;
