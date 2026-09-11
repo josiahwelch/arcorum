@@ -12,6 +12,11 @@ static char *tok_start;
 static char *tok_end;
 static char *tok_scan;
 
+// Helper functions
+static int is_terminator(const char *ptr) {
+    return *ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r' || *ptr == '\0';
+}
+
 static int string() {
     // Base case
     if (*tok_start != '"')
@@ -29,7 +34,7 @@ static ttype_t identifier() {
     if ((*tok_start < 'a' || *tok_start > 'z') && (*tok_start < 'A' || *tok_start > 'Z')) // First character must be alphabetical
         return 0;
 
-    for (;*tok_scan != ' ' && *tok_scan != '\t' && *tok_scan != '\n' && *tok_scan != '\r' && *tok_scan != '\0'; tok_scan++)
+    for (;!is_terminator(tok_scan); tok_scan++)
         if ((*tok_scan < 'a' || *tok_scan > 'z') && (*tok_scan < 'A' || *tok_scan > 'Z') && (*tok_scan < '0' || *tok_scan > '9')) // Rest of them must be alphanumeric
             return 0;
 
@@ -117,9 +122,9 @@ token_t *lex(char *src, ssize_t len) {
 
     for (tok_scan = src; tok_scan - src < len; tok_scan++) {
         // Whitespace, newline, and tab handling
-        while ((*tok_start == ' ' || *tok_start == '\t' || *tok_start == '\n' || *tok_start == '\r') && (src - tok_start) < len)
+        while ((is_terminator(tok_start)) && (src - tok_start) < len)
             tok_start++;
-        if ((*tok_scan == ' ' || *tok_scan == '\t' || *tok_scan == '\n' || *tok_scan == '\r') && (src - tok_scan) < len)
+        if ((is_terminator(tok_scan)) && (src - tok_scan) < len) // So that tok_scan is checked too
             tok_start = tok_scan + 1;
 
         if (tok_scan < tok_start)
