@@ -8,7 +8,10 @@
 #include <lexer.h>
 
 int main() {
-    const char src[] = "yello \"yeller\" yup";
+    const char src[] = "if \"yeller\"\n"
+                       "let yeller = \"yel\" + \"ler\"\n"
+                       "elif \"feller\"\n"
+                       "const yello << fellow";
     token_t *tokens = lex(src, strlen(src));
     for (int i = 0; tokens[i].value != NULL; i++) {
         switch (tokens[i].type) {
@@ -17,6 +20,9 @@ int main() {
                 break;
             case TOK_INVALID:
                 printf("INVALID: %s\n", tokens[i].value);
+                break;
+            case TOK_IDENTIFIER:
+                printf("IDENTIFIER: %s\n", tokens[i].value);
                 break;
             case TOK_INTEGER:
                 printf("INTEGER: %s\n", tokens[i].value);
@@ -28,7 +34,7 @@ int main() {
                 printf("STRING: %s\n", tokens[i].value);
                 break;
             default:
-                printf("IDENTIFIER: %s\n", tokens[i].value);
+                printf("MISC: %s\n", tokens[i].value);
                 break;
         }
     }
