@@ -16,8 +16,8 @@
 #include <stdbool.h>
 
 typedef enum {
-    TOK_EOF = 1,
-    TOK_INVALID,
+    TOK_INVALID = 0,
+    TOK_EOF,
 
     TOK_IDENTIFIER,
     TOK_INTEGER,
@@ -31,6 +31,7 @@ typedef enum {
     TOK_RETURN,
     TOK_IF,
     TOK_ELSE,
+    TOK_ELIF,
     TOK_WHILE,
     TOK_FOR,
     TOK_BREAK,
@@ -79,6 +80,8 @@ typedef enum {
     TOK_TILDE,
     TOK_SHIFT_LEFT,
     TOK_SHIFT_RIGHT,
+    TOK_INC,
+    TOK_DEC,
 
     TOK_LPAREN,
     TOK_RPAREN,

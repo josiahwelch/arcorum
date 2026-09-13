@@ -20,7 +20,7 @@ static int is_terminator(const char *ptr) {
 static int string() {
     // Base case
     if (*tok_start != '"')
-        return 0;
+        return TOK_INVALID;
     if (tok_scan == tok_start)
         tok_scan++;
     for (;*tok_scan != '"' && tok_scan != tok_end; tok_scan++) // To ensure that there isn't a \ before the end quotation mark
@@ -32,11 +32,11 @@ static int string() {
 static ttype_t identifier() {
     // Base case
     if ((*tok_start < 'a' || *tok_start > 'z') && (*tok_start < 'A' || *tok_start > 'Z')) // First character must be alphabetical
-        return 0;
+        return TOK_INVALID;
 
     for (;!is_terminator(tok_scan); tok_scan++)
         if ((*tok_scan < 'a' || *tok_scan > 'z') && (*tok_scan < 'A' || *tok_scan > 'Z') && (*tok_scan < '0' || *tok_scan > '9')) // Rest of them must be alphanumeric
-            return 0;
+            return TOK_INVALID;
 
     switch (tok_scan - tok_start) {
         case 2:
@@ -70,6 +70,8 @@ static ttype_t identifier() {
         case 4:
             if (strncmp(tok_start, "else", 4) == 0)
                 return TOK_ELSE;
+            if (strncmp(tok_start, "elif", 4) == 0)
+                return TOK_ELIF;
             if (strncmp(tok_start, "enum", 4) == 0)
                 return TOK_ENUM;
             if (strncmp(tok_start, "true", 4) == 0)
@@ -103,6 +105,53 @@ static ttype_t identifier() {
             break;
     }
             return TOK_IDENTIFIER;
+}
+
+static ttype_t math() {
+    if (tok_scan - tok_start > 2)
+        return 0;
+    if (tok_scan == tok_start)
+        switch (*tok_scan) {
+            case '+':
+                return TOK_PLUS;
+                break;
+            case '-':
+                return TOK_MINUS;
+                break;
+            case '*':
+                return TOK_AMP;
+                break;
+            case '/':
+                return TOK_SLASH;
+                break;
+            case '^':
+                return TOK_CARET;
+                break;
+            case '%':
+                return TOK_PERCENT;
+                break;
+            // Bit-wise functions
+            case '&':
+                return TOK_AMP;
+                break;
+            case '|':
+                return TOK_PIPE;
+                break;
+            case '~':
+                return TOK_TILDE;
+                break;
+            default:
+                break;
+        }
+    if (strncmp(tok_start, ">>", 2) == 0)
+        return TOK_SHIFT_RIGHT;
+    if (strncmp(tok_start, "<<", 2) == 0)
+        return TOK_SHIFT_LEFT;
+    if (strncmp(tok_start, "++", 2) == 0)
+        return TOK_INC;
+    if (strncmp(tok_start, "--", 2) == 0)
+        return TOK_DEC;
+    return TOK_INVALID;
 }
 
 /*
@@ -149,6 +198,15 @@ token_t *lex(char *src, ssize_t len) {
             tok_n++;
         }
 
+        // Math symbol handling
+        const ttype_t sym = math();
+        if (!!sym) {
+            tokens[tok_n].value = malloc(tok_scan - tok_start + 1);
+            strncpy(tokens[tok_n].value, tok_start, tok_scan - tok_start + 1);
+            tokens[tok_n].type = sym;
+            tok_start = tok_scan;
+            tok_n++;
+        }
     }
 
     return tokens;
