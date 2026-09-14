@@ -112,48 +112,54 @@ static ttype_t math() {
     if (tok_scan - tok_start > 0)
         return TOK_INVALID;
 
-    if (tok_scan++ && math() == TOK_INVALID)
-        switch (*tok_scan) {
-            case '+':
-                return TOK_PLUS;
-                break;
-            case '-':
-                return TOK_MINUS;
-                break;
-            case '*':
-                return TOK_AMP;
-                break;
-            case '/':
-                return TOK_SLASH;
-                break;
-            case '^':
-                return TOK_CARET;
-                break;
-            case '%':
-                return TOK_PERCENT;
-                break;
-            // Bit-wise functions
-            case '&':
-                return TOK_AMP;
-                break;
-            case '|':
-                return TOK_PIPE;
-                break;
-            case '~':
-                return TOK_TILDE;
-                break;
-            default:
-                break;
-        }
-    tok_scan--;
-    if (strncmp(tok_start, ">>", 2) == 0)
-        return TOK_SHIFT_RIGHT;
-    if (strncmp(tok_start, "<<", 2) == 0)
-        return TOK_SHIFT_LEFT;
-    if (strncmp(tok_start, "++", 2) == 0)
-        return TOK_INC;
-    if (strncmp(tok_start, "--", 2) == 0)
-        return TOK_DEC;
+    switch (*(tok_scan + 1)) {
+        case '+':
+            return *tok_scan == '+' ? TOK_INC : TOK_INVALID;
+            break;
+        case '-':
+            return *tok_scan == '-' ? TOK_DEC : TOK_INVALID;
+            break;
+        case '>':
+            return *tok_scan == '>' ? TOK_SHIFT_RIGHT : TOK_INVALID;
+            break;
+        case '<':
+            return *tok_scan == '<' ? TOK_SHIFT_LEFT : TOK_INVALID;
+            break;
+        default:
+            switch (*tok_scan) {
+                case '+':
+                    return TOK_PLUS;
+                    break;
+                case '-':
+                    return TOK_MINUS;
+                    break;
+                case '*':
+                    return TOK_AMP;
+                    break;
+                case '/':
+                    return TOK_SLASH;
+                    break;
+                case '^':
+                    return TOK_CARET;
+                    break;
+                case '%':
+                    return TOK_PERCENT;
+                    break;
+                    // Bit-wise functions
+                case '&':
+                    return TOK_AMP;
+                    break;
+                case '|':
+                    return TOK_PIPE;
+                    break;
+                case '~':
+                    return TOK_TILDE;
+                    break;
+                default:
+                    break;
+            }
+            break;
+    }
     return TOK_INVALID;
 }
 
