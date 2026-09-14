@@ -34,7 +34,7 @@ int main() {
                 printf("STRING: %s\n", tokens[i].value);
                 break;
             default:
-                printf("MISC: %s\n", tokens[i].value);
+                printf("%u: %s\n", tokens[i].type, tokens[i].value);
                 break;
         }
     }

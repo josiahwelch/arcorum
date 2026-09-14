@@ -108,9 +108,11 @@ static ttype_t identifier() {
 }
 
 static ttype_t math() {
-    if (tok_scan - tok_start > 2)
-        return 0;
-    if (tok_scan == tok_start)
+    // Base case
+    if (tok_scan - tok_start > 0)
+        return TOK_INVALID;
+
+    if (tok_scan++ && math() == TOK_INVALID)
         switch (*tok_scan) {
             case '+':
                 return TOK_PLUS;
@@ -143,6 +145,7 @@ static ttype_t math() {
             default:
                 break;
         }
+    tok_scan--;
     if (strncmp(tok_start, ">>", 2) == 0)
         return TOK_SHIFT_RIGHT;
     if (strncmp(tok_start, "<<", 2) == 0)
@@ -202,7 +205,7 @@ token_t *lex(char *src, ssize_t len) {
         const ttype_t sym = math();
         if (!!sym) {
             tokens[tok_n].value = malloc(tok_scan - tok_start + 1);
-            strncpy(tokens[tok_n].value, tok_start, tok_scan - tok_start + 1);
+            strncpy(tokens[tok_n].value, tok_start, tok_scan - tok_start + 2);
             tokens[tok_n].type = sym;
             tok_start = tok_scan;
             tok_n++;
