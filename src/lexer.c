@@ -129,111 +129,66 @@ static ttype_t identifier() {
             return TOK_IDENTIFIER;
 }
 
-static ttype_t math() {
+static ttype_t operator(ssize_t *len) {
     // Base case
     if (tok_scan - tok_start > 0)
         return TOK_INVALID;
 
     const char next = tok_scan + 1 < tok_end ? *(tok_scan + 1) : '\0';
+    *len = 1;
 
-    switch (next) {
+    switch (*tok_scan) {
         case '+':
-            return *tok_scan == '+' ? TOK_INC : TOK_INVALID;
-            break;
+            if (next == '+' || next == '=')
+                *len = 2;
+            return next == '+' ? TOK_INC : next == '=' ? TOK_PLUS_EQUAL : TOK_PLUS;
         case '-':
-            return *tok_scan == '-' ? TOK_DEC : TOK_INVALID;
-            break;
-        case '>':
-            return *tok_scan == '>' ? TOK_SHIFT_RIGHT : TOK_INVALID;
-            break;
-        case '<':
-            return *tok_scan == '<' ? TOK_SHIFT_LEFT : TOK_INVALID;
-            break;
-        default:
-            switch (*tok_scan) {
-                case '+':
-                    return TOK_PLUS;
-                    break;
-                case '-':
-                    return TOK_MINUS;
-                    break;
-                case '*':
-                    return TOK_STAR;
-                    break;
-                case '/':
-                    return TOK_SLASH;
-                    break;
-                case '^':
-                    return TOK_CARET;
-                    break;
-                case '%':
-                    return TOK_PERCENT;
-                    break;
-                    // Bit-wise functions
-                case '&':
-                    return TOK_AMP;
-                    break;
-                case '|':
-                    return TOK_PIPE;
-                    break;
-                case '~':
-                    return TOK_TILDE;
-                    break;
-                default:
-                    break;
-            }
-            break;
-    }
-    return TOK_INVALID;
-}
-
-static ttype_t assignment_conditional() {
-    // Base case
-    if (tok_scan - tok_start > 0)
-        return TOK_INVALID;
-
-    const char next = tok_scan + 1 < tok_end ? *(tok_scan + 1) : '\0';
-
-    switch (next) {
+            if (next == '-' || next == '=')
+                *len = 2;
+            return next == '-' ? TOK_DEC : next == '=' ? TOK_MINUS_EQUAL : TOK_MINUS;
+        case '*':
+            if (next == '=')
+                *len = 2;
+            return next == '=' ? TOK_STAR_EQUAL : TOK_STAR;
+        case '/':
+            if (next == '=')
+                *len = 2;
+            return next == '=' ? TOK_SLASH_EQUAL : TOK_SLASH;
         case '=':
-            switch (*tok_scan) {
-                case '=':
-                    return TOK_EQUAL_EQUAL;
-                case '+':
-                    return TOK_PLUS_EQUAL;
-                case '-':
-                    return TOK_MINUS_EQUAL;
-                case '*':
-                    return TOK_STAR_EQUAL;
-                case '/':
-                    return TOK_SLASH_EQUAL;
-                case '!':
-                    return TOK_BANG_EQUAL;
-                case '<':
-                    return TOK_LESS_EQUAL;
-                case '>':
-                    return TOK_GREATER_EQUAL;
-                default:
-                    break;
-            }
-            break;
+            if (next == '=')
+                *len = 2;
+            return next == '=' ? TOK_EQUAL_EQUAL : TOK_EQUAL;
+        case '!':
+            if (next == '=')
+                *len = 2;
+            return next == '=' ? TOK_BANG_EQUAL : TOK_BANG;
+        case '<':
+            if (next == '=' || next == '<')
+                *len = 2;
+            return next == '=' ? TOK_LESS_EQUAL : next == '<' ? TOK_SHIFT_LEFT : TOK_LESS;
+        case '>':
+            if (next == '=' || next == '>')
+                *len = 2;
+            return next == '=' ? TOK_GREATER_EQUAL : next == '>' ? TOK_SHIFT_RIGHT : TOK_GREATER;
+        case '&':
+            if (next == '&')
+                *len = 2;
+            return next == '&' ? TOK_AMP_AMP : TOK_AMP;
+        case '|':
+            if (next == '|')
+                *len = 2;
+            return next == '|' ? TOK_PIPE_PIPE : TOK_PIPE;
+        case '%':
+            return TOK_PERCENT;
+        case '^':
+            return TOK_CARET;
+        case '~':
+            return TOK_TILDE;
         default:
-            switch (*tok_scan) {
-                case '=':
-                    return TOK_EQUAL;
-                case '!':
-                    return TOK_BANG;
-                case '<':
-                    return TOK_LESS;
-                case '>':
-                    return TOK_GREATER;
-                default:
-                    break;
-            }
-            break;
+            return TOK_INVALID;
     }
-    return TOK_INVALID;
 }
+
 /*
  * @param a pointer to the source char array
  * @param size of source char array
@@ -275,22 +230,12 @@ token_t *lex(char *src, ssize_t len) {
             continue;
         }
 
-        // Assignment and conditional handling
-        const ttype_t assignment = assignment_conditional();
-        if (assignment != TOK_INVALID) {
-            const bool is_double = tok_scan + 1 < tok_end && *(tok_scan + 1) == '=';
-            const char *end = tok_scan + (is_double ? 2 : 1);
-            add_token(assignment, end);
-            tok_scan = (char *)end - 1;
-            continue;
-        }
-
-        // Math symbol handling
-        const ttype_t sym = math();
-        if (sym != TOK_INVALID) {
-            const bool is_double = sym == TOK_INC || sym == TOK_DEC || sym == TOK_SHIFT_LEFT || sym == TOK_SHIFT_RIGHT;
-            const char *end = tok_scan + (is_double ? 2 : 1);
-            add_token(sym, end);
+        // Operator handling
+        ssize_t operator_len;
+        const ttype_t operator_type = operator(&operator_len);
+        if (operator_type != TOK_INVALID) {
+            const char *end = tok_scan + operator_len;
+            add_token(operator_type, end);
             tok_scan = (char *)end - 1;
         }
     }
