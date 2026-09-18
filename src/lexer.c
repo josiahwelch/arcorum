@@ -57,9 +57,8 @@ static ttype_t identifier() {
     if ((*tok_start < 'a' || *tok_start > 'z') && (*tok_start < 'A' || *tok_start > 'Z')) // First character must be alphabetical
         return TOK_INVALID;
 
-    for (;tok_scan != tok_end && !is_terminator(tok_scan); tok_scan++)
-        if ((*tok_scan < 'a' || *tok_scan > 'z') && (*tok_scan < 'A' || *tok_scan > 'Z') && (*tok_scan < '0' || *tok_scan > '9')) // Rest of them must be alphanumeric
-            return TOK_INVALID;
+    while (tok_scan != tok_end && ((*tok_scan >= 'a' && *tok_scan <= 'z') || (*tok_scan >= 'A' && *tok_scan <= 'Z') || (*tok_scan >= '0' && *tok_scan <= '9')))
+        tok_scan++;
 
     switch (tok_scan - tok_start) {
         case 2:
@@ -188,6 +187,53 @@ static ttype_t math() {
     return TOK_INVALID;
 }
 
+static ttype_t assignment_conditional() {
+    // Base case
+    if (tok_scan - tok_start > 0)
+        return TOK_INVALID;
+
+    const char next = tok_scan + 1 < tok_end ? *(tok_scan + 1) : '\0';
+
+    switch (next) {
+        case '=':
+            switch (*tok_scan) {
+                case '=':
+                    return TOK_EQUAL_EQUAL;
+                case '+':
+                    return TOK_PLUS_EQUAL;
+                case '-':
+                    return TOK_MINUS_EQUAL;
+                case '*':
+                    return TOK_STAR_EQUAL;
+                case '/':
+                    return TOK_SLASH_EQUAL;
+                case '!':
+                    return TOK_BANG_EQUAL;
+                case '<':
+                    return TOK_LESS_EQUAL;
+                case '>':
+                    return TOK_GREATER_EQUAL;
+                default:
+                    break;
+            }
+            break;
+        default:
+            switch (*tok_scan) {
+                case '=':
+                    return TOK_EQUAL;
+                case '!':
+                    return TOK_BANG;
+                case '<':
+                    return TOK_LESS;
+                case '>':
+                    return TOK_GREATER;
+                default:
+                    break;
+            }
+            break;
+    }
+    return TOK_INVALID;
+}
 /*
  * @param a pointer to the source char array
  * @param size of source char array
@@ -226,6 +272,16 @@ token_t *lex(char *src, ssize_t len) {
         if (id != TOK_INVALID) {
             add_token(id, tok_scan);
             tok_scan--;
+            continue;
+        }
+
+        // Assignment and conditional handling
+        const ttype_t assignment = assignment_conditional();
+        if (assignment != TOK_INVALID) {
+            const bool is_double = tok_scan + 1 < tok_end && *(tok_scan + 1) == '=';
+            const char *end = tok_scan + (is_double ? 2 : 1);
+            add_token(assignment, end);
+            tok_scan = (char *)end - 1;
             continue;
         }
 
