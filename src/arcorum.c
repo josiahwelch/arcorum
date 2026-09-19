@@ -8,10 +8,10 @@
 #include <lexer.h>
 
 int main() {
-    const char src[] = "if \"yeller\"\n"
-                       "let yeller = \"yel\" + \"ler\"\n"
-                       "elif \"feller\"\n"
-                       "const yello << fellow";
+    const char src[] = "if (1 == 1) {\n"
+                       "let yeller = \"yel\" + \"ler\";\n"
+                       "} elif (2 <= 1.99) {\n"
+                       "const u8 var = yello << fellow;\n}";
     token_t *tokens = lex(src, strlen(src));
     for (int i = 0; tokens[i].value != NULL; i++) {
         switch (tokens[i].type) {

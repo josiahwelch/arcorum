@@ -41,7 +41,8 @@ static int string() {
         return TOK_INVALID;
     if (tok_scan == tok_start)
         tok_scan++;
-    while (tok_scan != tok_end && *tok_scan != '"') { // To ensure that there isn't a \ before the end quotation mark
+    while (tok_scan != tok_end && *tok_scan != '"') {
+        // To ensure that there isn't a \ before the end quotation mark
         if (*tok_scan == '\\' && tok_scan + 1 != tok_end)
             tok_scan++;
         tok_scan++;
@@ -219,6 +220,19 @@ static ttype_t punctuation() {
     }
 }
 
+static ttype_t number() {
+    bool is_float = false;
+    if (*tok_scan < '0' || *tok_scan > '9')
+        return TOK_INVALID;
+    for (;tok_scan != tok_end && ((*tok_scan >= '0' && *tok_scan <= '9') || *tok_scan == '.'); tok_scan++)
+        if (*tok_scan == '.') {
+            if (is_float)
+                return TOK_INVALID;
+            is_float = true;
+        }
+    return is_float ? TOK_FLOAT : TOK_INTEGER;
+}
+
 /*
  * @param a pointer to the source char array
  * @param size of source char array
@@ -272,9 +286,12 @@ token_t *lex(char *src, ssize_t len) {
 
         // Punctuation handling
         const ttype_t punctuation_type = punctuation();
-        if (punctuation_type != TOK_INVALID) {
+        if (punctuation_type != TOK_INVALID)
             add_token(punctuation_type, tok_scan + 1);
-        }
+
+        const ttype_t number_type = number();
+        if (number_type != TOK_INVALID)
+            add_token(number_type, tok_scan);
     }
 
     return tokens;
