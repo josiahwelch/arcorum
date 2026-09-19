@@ -247,7 +247,7 @@ static ttype_t number() {
  * @return a pointer to the lexed token array
  */
 token_t *lex(char *src, ssize_t len) {
-    tok_len = len + 2;
+    tok_len = len;
     tokens = calloc(tok_len, sizeof(token_t));
     tok_n = 0;
     tok_start = src;
@@ -298,11 +298,17 @@ token_t *lex(char *src, ssize_t len) {
         if (punctuation_type != TOK_INVALID)
             add_token(punctuation_type, tok_scan + 1);
 
+        // Number handling
         const ttype_t number_type = number();
         if (number_type != TOK_INVALID) {
             add_token(number_type, tok_scan);
             tok_scan--;
-            continue;
+        }
+
+        // Reallocates memory
+        for (;tok_n >= tok_len; tok_len += len) {
+            if (realloc(tokens, tok_len * sizeof(token_t)) == NULL)
+                return NULL;
         }
     }
 
