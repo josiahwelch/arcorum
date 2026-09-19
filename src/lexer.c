@@ -8,9 +8,9 @@
 #include <lexer.h>
 
 // Lexer token variables
-ssize_t tok_len;
-ssize_t tok_n = 0;
-token_t *tokens;
+static ssize_t tok_len;
+static ssize_t tok_n = 0;
+static token_t *tokens;
 
 // Start, end, and scan pointers
 static char *tok_start;
