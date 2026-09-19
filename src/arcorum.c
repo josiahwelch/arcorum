@@ -8,10 +8,42 @@
 #include <lexer.h>
 
 int main() {
-    const char src[] = "if (1 == 1) {\n"
-                       "let yeller = \"yel\" + \"ler\";\n"
-                       "} elif (2 <= 1.99) {\n"
-                       "const u8 var = yello << fellow;\n}";
+    char src[] = "import core.math;\n"
+                 "enum Color { red, green, blue }\n"
+                 "struct Point { x: i32, y: i32 }\n"
+                 "fn main() {\n"
+                 "    let byte: u8 = 1;\n"
+                 "    let word: u16 = 2;\n"
+                 "    let dword: u32 = 3;\n"
+                 "    let qword: u64 = 4;\n"
+                 "    let tiny: i8 = 5;\n"
+                 "    let small: i16 = 6;\n"
+                 "    let number: i32 = 7;\n"
+                 "    let large: i64 = 8;\n"
+                 "    let enabled: bool = true;\n"
+                 "    let letter = 'a';\n"
+                 "    let message = \"yello\";\n"
+                 "    let decimal = 1.25;\n"
+                 "    let item = values[0];\n"
+                 "    number = 1 + 2 - 3 * 4 / 5 % 6;\n"
+                 "    number += 1;\n"
+                 "    number -= 1;\n"
+                 "    number *= 2;\n"
+                 "    number /= 2;\n"
+                 "    number++;\n"
+                 "    number--;\n"
+                 "    number = number << 1 >> 1;\n"
+                 "    number = number & 7 | 8 ^ ~9;\n"
+                 "    if (number == 1 && number != 2 || !false) {\n"
+                 "        number = number < 10 + number <= 10;\n"
+                 "    } elif (number > 0 && number >= 0) {\n"
+                 "        const i32 fixed = number;\n"
+                 "    } else {\n"
+                 "        while (number) { break; }\n"
+                 "    }\n"
+                 "    for (item) { continue; }\n"
+                 "    return point.x;\n"
+                 "}";
     token_t *tokens = lex(src, strlen(src));
     for (int i = 0; tokens[i].value != NULL; i++) {
         switch (tokens[i].type) {

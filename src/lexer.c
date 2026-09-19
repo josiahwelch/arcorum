@@ -35,22 +35,30 @@ static int is_terminator(const char *ptr) {
     return *ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r' || *ptr == '\0';
 }
 
-static int string() {
+static ttype_t quoted_literal() {
     // Base case
-    if (*tok_start != '"')
+    const char quote = *tok_start;
+    if (quote != '"' && quote != '\'')
         return TOK_INVALID;
+
+    ssize_t character_count = 0;
     if (tok_scan == tok_start)
         tok_scan++;
-    while (tok_scan != tok_end && *tok_scan != '"') {
-        // To ensure that there isn't a \ before the end quotation mark
+
+    while (tok_scan != tok_end && *tok_scan != quote) {
         if (*tok_scan == '\\' && tok_scan + 1 != tok_end)
             tok_scan++;
         tok_scan++;
+        character_count++;
     }
+
     if (tok_scan == tok_end)
         return TOK_INVALID;
     tok_scan++;
-    return TOK_STRING;
+
+    if (quote == '\'' && character_count != 1)
+        return TOK_INVALID;
+    return quote == '"' ? TOK_STRING : TOK_CHAR;
 }
 
 static ttype_t identifier() {
@@ -239,7 +247,7 @@ static ttype_t number() {
  * @return a pointer to the lexed token array
  */
 token_t *lex(char *src, ssize_t len) {
-    tok_len = len + 1;
+    tok_len = len + 2;
     tokens = calloc(tok_len, sizeof(token_t));
     tok_n = 0;
     tok_start = src;
@@ -259,9 +267,10 @@ token_t *lex(char *src, ssize_t len) {
         if (tok_start == tok_end)
             break;
 
-        // String handling
-        if (string()) {
-            add_token(TOK_STRING, tok_scan);
+        // String and character literal handling
+        const ttype_t literal_type = quoted_literal();
+        if (literal_type != TOK_INVALID) {
+            add_token(literal_type, tok_scan);
             tok_scan--;
             continue;
         }
@@ -290,9 +299,15 @@ token_t *lex(char *src, ssize_t len) {
             add_token(punctuation_type, tok_scan + 1);
 
         const ttype_t number_type = number();
-        if (number_type != TOK_INVALID)
+        if (number_type != TOK_INVALID) {
             add_token(number_type, tok_scan);
+            tok_scan--;
+            continue;
+        }
     }
+
+    tok_start = tok_end;
+    add_token(TOK_EOF, tok_end);
 
     return tokens;
 }
