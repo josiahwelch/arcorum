@@ -247,7 +247,7 @@ static ttype_t number() {
  * @return a pointer to the lexed token array
  */
 token_t *lex(char *src, ssize_t len) {
-    tok_len = len;
+    tok_len = len + 2;
     tokens = calloc(tok_len, sizeof(token_t));
     tok_n = 0;
     tok_start = src;
@@ -305,11 +305,6 @@ token_t *lex(char *src, ssize_t len) {
             tok_scan--;
         }
 
-        // Reallocates memory
-        for (;tok_n >= tok_len; tok_len += len) {
-            if (realloc(tokens, tok_len * sizeof(token_t)) == NULL)
-                return NULL;
-        }
     }
 
     tok_start = tok_end;
