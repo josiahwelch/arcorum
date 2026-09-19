@@ -189,6 +189,36 @@ static ttype_t operator(ssize_t *len) {
     }
 }
 
+static ttype_t punctuation() {
+    if (tok_scan - tok_start > 0)
+        return TOK_INVALID;
+
+    switch (*tok_scan) {
+        case '(':
+            return TOK_LPAREN;
+        case ')':
+            return TOK_RPAREN;
+        case '{':
+            return TOK_LBRACE;
+        case '}':
+            return TOK_RBRACE;
+        case '[':
+            return TOK_LBRACKET;
+        case ']':
+            return TOK_RBRACKET;
+        case ':':
+            return TOK_COLON;
+        case ';':
+            return TOK_SEMICOLON;
+        case ',':
+            return TOK_COMMA;
+        case '.':
+            return TOK_DOT;
+        default:
+            return TOK_INVALID;
+    }
+}
+
 /*
  * @param a pointer to the source char array
  * @param size of source char array
@@ -237,6 +267,13 @@ token_t *lex(char *src, ssize_t len) {
             const char *end = tok_scan + operator_len;
             add_token(operator_type, end);
             tok_scan = (char *)end - 1;
+            continue;
+        }
+
+        // Punctuation handling
+        const ttype_t punctuation_type = punctuation();
+        if (punctuation_type != TOK_INVALID) {
+            add_token(punctuation_type, tok_scan + 1);
         }
     }
 
