@@ -99,6 +99,8 @@ typedef struct {
     char *value;
     ssize_t value_len;
     ttype_t type;
+    ssize_t line; // 1-based
+    ssize_t col;  // 1-based
 } token_t;
 
 /* Returns an owned TOK_EOF-terminated array, or NULL on failure. */
