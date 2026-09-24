@@ -11,7 +11,8 @@ int main() {
     char src[] = "import core.math;\n"
                  "enum Color { red, green, blue }\n"
                  "struct Point { x: i32, y: i32 }\n"
-                 "fn main() {\n"
+                 "fn add(a: i32, b: i32): i32 { return a + b; }\n"
+                 "fn main(): i32 {\n"
                  "    let byte: u8 = 1;\n"
                  "    let word: u16 = 2;\n"
                  "    let dword: u32 = 3;\n"
@@ -37,15 +38,17 @@ int main() {
                  "    if (number == 1 && number != 2 || !false) {\n"
                  "        number = number < 10 + number <= 10;\n"
                  "    } elif (number > 0 && number >= 0) {\n"
-                 "        const i32 fixed = number;\n"
+                 "        const fixed: i32 = number;\n"
                  "    } else {\n"
                  "        while (number) { break; }\n"
                  "    }\n"
-                 "    for (item) { continue; }\n"
+                 "    for (let i: i32 = 0; i < 10; i++) { continue; }\n"
+                 "    let bad = @;\n"
                  "    return point.x;\n"
                  "}";
     token_t *tokens = lex(src, strlen(src));
     for (int i = 0; tokens[i].value != NULL; i++) {
+        printf("%zd:%zd ", tokens[i].line, tokens[i].col);
         switch (tokens[i].type) {
             case TOK_EOF:
                 printf("EOF: %s\n", tokens[i].value);

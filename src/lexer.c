@@ -17,9 +17,23 @@ static char *tok_start;
 static char *tok_end;
 static char *tok_scan;
 
+// Line/column tracking
+static char *pos_scan;
+static char *line_start;
+static ssize_t line;
+
 // Helper functions
 static void add_token(const ttype_t type, const char *end) {
     const ssize_t value_len = end - tok_start;
+
+    // Catching the line counter up to the start of this token
+    for (; pos_scan < tok_start; pos_scan++)
+        if (*pos_scan == '\n') {
+            line++;
+            line_start = pos_scan + 1;
+        }
+    tokens[tok_n].line = line;
+    tokens[tok_n].col = tok_start - line_start + 1;
 
     tokens[tok_n].value = malloc(value_len + 1);
     memcpy(tokens[tok_n].value, tok_start, value_len);
@@ -35,7 +49,7 @@ static int is_terminator(const char *ptr) {
     return *ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r' || *ptr == '\0';
 }
 
-static ttype_t string() {
+static ttype_t quoted_literal() {
     // Base case
     const char quote = *tok_start;
     if (quote != '"' && quote != '\'')
@@ -230,7 +244,7 @@ static ttype_t punctuation() {
 
 static ttype_t number() {
     bool is_float = false;
-    if (*tok_scan < '0' || *tok_scan > '9')
+    if (tok_scan == tok_end || *tok_scan < '0' || *tok_scan > '9')
         return TOK_INVALID;
     for (;tok_scan != tok_end && ((*tok_scan >= '0' && *tok_scan <= '9') || *tok_scan == '.'); tok_scan++)
         if (*tok_scan == '.') {
@@ -252,15 +266,18 @@ token_t *lex(char *src, ssize_t len) {
     tok_n = 0;
     tok_start = src;
     tok_end = src + len;
+    pos_scan = src;
+    line_start = src;
+    line = 1;
 
     // Handling token array
 
     for (tok_scan = src; tok_scan - src < len; tok_scan++) {
         // Whitespace, newline, and tab handling
-        while (tok_start < tok_end && is_terminator(tok_start))
-            tok_start++;
         if (tok_scan < tok_end && is_terminator(tok_scan)) // So that tok_scan is checked too
             tok_start = tok_scan + 1;
+        while (tok_start < tok_end && is_terminator(tok_start))
+            tok_start++;
 
         if (tok_scan < tok_start)
             tok_scan = tok_start;
@@ -268,7 +285,7 @@ token_t *lex(char *src, ssize_t len) {
             break;
 
         // String and character literal handling
-        const ttype_t string_type = string();
+        const ttype_t string_type = quoted_literal();
         if (string_type != TOK_INVALID) {
             add_token(string_type, tok_scan);
             tok_scan--;
@@ -295,16 +312,23 @@ token_t *lex(char *src, ssize_t len) {
 
         // Punctuation handling
         const ttype_t punctuation_type = punctuation();
-        if (punctuation_type != TOK_INVALID)
+        if (punctuation_type != TOK_INVALID) {
             add_token(punctuation_type, tok_scan + 1);
+            continue;
+        }
 
         // Number handling
         const ttype_t number_type = number();
         if (number_type != TOK_INVALID) {
             add_token(number_type, tok_scan);
             tok_scan--;
+            continue;
         }
 
+        // Unrecognized input (a stray character, or an unterminated string that ran to the end)
+        const char *end = tok_scan > tok_start ? tok_scan : tok_scan + 1;
+        add_token(TOK_INVALID, end);
+        tok_scan = (char *)end - 1;
     }
 
     tok_start = tok_end;
