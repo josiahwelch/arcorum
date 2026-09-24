@@ -35,7 +35,7 @@ static int is_terminator(const char *ptr) {
     return *ptr == ' ' || *ptr == '\t' || *ptr == '\n' || *ptr == '\r' || *ptr == '\0';
 }
 
-static ttype_t quoted_literal() {
+static ttype_t string() {
     // Base case
     const char quote = *tok_start;
     if (quote != '"' && quote != '\'')
@@ -268,9 +268,9 @@ token_t *lex(char *src, ssize_t len) {
             break;
 
         // String and character literal handling
-        const ttype_t literal_type = quoted_literal();
-        if (literal_type != TOK_INVALID) {
-            add_token(literal_type, tok_scan);
+        const ttype_t string_type = string();
+        if (string_type != TOK_INVALID) {
+            add_token(string_type, tok_scan);
             tok_scan--;
             continue;
         }
