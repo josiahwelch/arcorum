@@ -16,12 +16,11 @@ declaration = import_decl
 
 import_decl = "import" IDENTIFIER { "." IDENTIFIER } ";" ;
 
-fn_decl     = "fn" IDENTIFIER "(" [ params ] ")" [ ":" type ] block ;
-params      = param { "," param } [ "," ] ;
-param       = IDENTIFIER ":" type ;
+fn_decl     = "fn" IDENTIFIER "(" [ field_params ] ")" [ ":" type ] block ;
+field_params= field_param { "," field_param } [ "," ] ;
+field_param = IDENTIFIER ":" type ;
 
-struct_decl = "struct" IDENTIFIER "{" [ field { "," field } [ "," ] ] "}" ;
-field       = IDENTIFIER ":" type ;
+struct_decl = "struct" IDENTIFIER "{" field_params "}" ;
 
 enum_decl   = "enum" IDENTIFIER "{" [ IDENTIFIER { "," IDENTIFIER } [ "," ] ] "}" ;
 
@@ -54,7 +53,7 @@ simple_stmt = var_decl
             | assignment
             | expression ;                       (* e.g. a bare call: f(x); *)
 
-var_decl    = ( "let" | "const" ) IDENTIFIER [ ":" type ] [ "=" expression ] ;
+var_decl    = ( "let" | "const" ) field_params [ "=" expression ] ;
 assignment  = place ( "=" | "+=" | "-=" | "*=" | "/=" ) expression
             | place ( "++" | "--" ) ;
 place       = postfix ;                          (* checked later: must be ident, a.b, or a[i] *)
