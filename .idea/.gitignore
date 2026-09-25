@@ -8,3 +8,5 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Per-user Markdown preview provider choice (crashes with the experimental Compose renderer)
+/markdown.xml
