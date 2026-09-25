@@ -81,11 +81,11 @@ as in Rust and Go, so `x & 7 == 0` means `(x & 7) == 0`. In C it means `x & (7 =
 
 | Prec | Operators              | Kind          |
 |------|------------------------|---------------|
-| 1    | `\|\|`                 | logical or    |
+| 1    | `&#124;&#124;`         | logical or    |
 | 2    | `&&`                   | logical and   |
 | 3    | `==` `!=`              | equality      |
 | 4    | `<` `<=` `>` `>=`      | comparison    |
-| 5    | `\|`                   | bitwise or    |
+| 5    | `&#124;`               | bitwise or    |
 | 6    | `^`                    | bitwise xor   |
 | 7    | `&`                    | bitwise and   |
 | 8    | `<<` `>>`              | shift         |
