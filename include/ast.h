@@ -45,11 +45,97 @@ typedef struct {
     token_t *enums;
 } enum_decl_t;
 
-typedef struct {} binary_t;
+typedef struct expression_t expression_t;
+typedef struct unary_t unary_t;
 
 typedef struct {
+    token_t *token;
+    bool is_expr;
+    expression_t *expression;
+} primary_t;
+
+typedef enum {
+    PAREN,
+    SQUARE,
+    SUBMEM
+} postfix_type_t;
+
+typedef struct {
+    primary_t *primary;
+    postfix_type_t *type;
+    field_params_t *args;
+    expression_t *expression;
+    token_t *id;
+} postfix_t;
+
+struct unary_t {
+    postfix_t *postfix;
+    bool is_unary;
+    unary_t *unary;
+};
+
+typedef struct {
+    unary_t *unaries;
+    ttype_t type;
+    uint16_t count;
+} mul_div_t;
+
+typedef struct {
+    mul_div_t *mul_divs;
+    bool is_sub;
+    uint16_t count;
+} add_sub_t;
+
+typedef struct {
+    add_sub_t *add_subs;
+    bool is_left;
+    uint16_t count;
+} shift_t;
+
+typedef struct {
+    shift_t *shifts;
+    uint16_t count;
+} bit_and_t;
+
+typedef struct {
+    bit_and_t *bit_ands;
+    uint16_t count;
+} bit_xor_t;
+
+typedef struct {
+    bit_xor_t *bit_xors;
+    uint16_t count;
+} bit_or_t;
+
+typedef struct {
+    bit_or_t *bit_ors;
+    ttype_t type;
+    uint16_t count;
+} comp_t;
+
+typedef struct {
+    comp_t *comps;
+    bool is_not_equal;
+    uint16_t count;
+} eq_t;
+
+typedef struct {
+    eq_t *eqs;
+    uint16_t count;
+} log_and_t;
+
+typedef struct {
+    log_and_t *log_ands;
+    uint16_t count;
+} log_or_t;
+
+typedef struct {
+    log_or_t *log_or;
+} binary_t;
+
+struct expression_t {
     binary_t binary;
-} expression_t;
+};
 
 typedef struct {
     field_params_t vars;

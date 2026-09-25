@@ -75,17 +75,19 @@ Rules the parser does not enforce (they belong in the semantic pass):
 
 ## Expressions
 
-The expressions are parsed with a Pratt (precedence-climbing) loop. All binary operators
-are left-associative. The bitwise operators bind **tighter** than the comparisons,
-as in Rust and Go, so `x & 7 == 0` means `(x & 7) == 0`. In C it means `x & (7 == 0)`.
+The expressions are parsed with a Pratt (precedence-climbing) loop, not a chain of
+one grammar rule per precedence level. All binary operators are left-associative,
+so `a - b + c` parses as `(a - b) + c`, not `a - (b + c)`. The bitwise operators bind
+**tighter** than the comparisons, as in Rust and Go, so `x & 7 == 0` means `(x & 7) == 0`.
+In C it means `x & (7 == 0)`.
 
 | Prec | Operators              | Kind          |
 |------|------------------------|---------------|
-| 1    | `&#124;&#124;`         | logical or    |
+| 1    | `||`                   | logical or    |
 | 2    | `&&`                   | logical and   |
 | 3    | `==` `!=`              | equality      |
 | 4    | `<` `<=` `>` `>=`      | comparison    |
-| 5    | `&#124;`               | bitwise or    |
+| 5    | `|`                    | bitwise or    |
 | 6    | `^`                    | bitwise xor   |
 | 7    | `&`                    | bitwise and   |
 | 8    | `<<` `>>`              | shift         |
@@ -95,7 +97,20 @@ as in Rust and Go, so `x & 7 == 0` means `(x & 7) == 0`. In C it means `x & (7 =
 | 12   | `()` `[]` `.`          | postfix       |
 
 ```ebnf
-expression  = binary ;                           (* driven by the table above *)
+expression     = binary ;
+binary         = logic_or ;
+
+logic_or       = logic_and { "||" logic_and } ;
+logic_and      = equality { "&&" equality } ;
+equality       = comparison { ( "==" | "!=" ) comparison } ;
+comparison     = bit_or { ( "<" | "<=" | ">" | ">=" ) bit_or } ;
+bit_or         = bit_xor { "|" bit_xor } ;
+bit_xor        = bit_and { "^" bit_and } ;
+bit_and        = shift { "&" shift } ;
+shift          = additive { ( "<<" | ">>" ) additive } ;
+additive       = multiplicative { ( "+" | "-" ) multiplicative } ;
+multiplicative = unary { ( "*" | "/" | "%" ) unary } ;
+
 unary       = ( "!" | "~" | "-" ) unary | postfix ;
 postfix     = primary { "(" [ args ] ")" | "[" expression "]" | "." IDENTIFIER } ;
 args        = expression { "," expression } [ "," ] ;
@@ -104,6 +119,18 @@ primary     = INTEGER | FLOAT | CHAR | STRING
             | IDENTIFIER
             | "(" expression ")" ;
 ```
+
+Each `{ op next_tier }` rule is inherently left-associative — the loop folds operands
+left to right as it matches, so `a - b + c` reduces to `(a - b) + c` without needing
+extra grammar to say so. The rules are ordered loosest-binding first (`logic_or`) down
+to tightest (`multiplicative` bottoms into `unary`), which is exactly the table above
+read top to bottom.
+
+The parser doesn't implement this as twelve nested functions, one per rule — it's a
+single Pratt (precedence-climbing) loop parameterized on a minimum-precedence argument,
+which produces the same trees as the cascade above but without the call-stack depth per
+tier. The cascade is the rigorous, unambiguous *specification*; the Pratt loop is the
+implementation strategy for it.
 
 ## Open questions
 

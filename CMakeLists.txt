@@ -8,6 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 add_executable(arcorum
     src/arcorum.c
     src/lexer.c
+        include/ast.h
 )
 
 target_include_directories(arcorum PRIVATE
