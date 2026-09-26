@@ -61,11 +61,17 @@ typedef enum {
 } postfix_type_t;
 
 typedef struct {
+    postfix_type_t kind;
+    union {
+        field_params_t args;      /* PAREN:  "(" [ args ] ")" */
+        expression_t *index;      /* SQUARE: "[" expression "]" */
+        token_t *field;           /* SUBMEM: "." IDENTIFIER */
+    };
+} postfix_op_t;
+
+typedef struct {
     primary_t *primary;
-    postfix_type_t *type;
-    field_params_t *args;
-    expression_t *expression;
-    token_t *submems;
+    postfix_op_t *ops;
     uint16_t count;
 } postfix_t;
 
