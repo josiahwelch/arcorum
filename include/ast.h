@@ -65,30 +65,47 @@ typedef struct {
     postfix_type_t *type;
     field_params_t *args;
     expression_t *expression;
-    token_t *id;
+    token_t *submems;
+    uint16_t count;
 } postfix_t;
 
 struct unary_t {
     postfix_t *postfix;
+    ttype_t prefix;
     bool is_unary;
     unary_t *unary;
 };
 
 typedef struct {
-    unary_t *unaries;
+    unary_t *unary;
     ttype_t type;
+} unary_pairs_t;
+
+typedef struct {
+    unary_t *unary;
+    unary_pairs_t *pairs;
     uint16_t count;
 } mul_div_t;
 
 typedef struct {
-    mul_div_t *mul_divs;
+    mul_div_t *mul_div;
     bool is_sub;
+} mul_div_pair_t;
+
+typedef struct {
+    mul_div_t *mul_div;
+    mul_div_pair_t *pairs;
     uint16_t count;
 } add_sub_t;
 
 typedef struct {
-    add_sub_t *add_subs;
+    add_sub_t *add_sub;
     bool is_left;
+} add_sub_pair_t;
+
+typedef struct {
+    add_sub_t add_sub;
+    add_sub_pair_t *pairs;
     uint16_t count;
 } shift_t;
 
@@ -108,14 +125,24 @@ typedef struct {
 } bit_or_t;
 
 typedef struct {
-    bit_or_t *bit_ors;
+    bit_or_t *bit_or;
     ttype_t type;
+} comp_pair_t;
+
+typedef struct {
+    bit_or_t *bit_or;
+    comp_pair_t *pairs;
     uint16_t count;
 } comp_t;
 
 typedef struct {
-    comp_t *comps;
+    comp_t *comp;
     bool is_not_equal;
+} eq_pair_t;
+
+typedef struct {
+    comp_t *comp;
+    eq_pair_t *pairs;
     uint16_t count;
 } eq_t;
 
