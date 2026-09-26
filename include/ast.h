@@ -76,10 +76,12 @@ typedef struct {
 } postfix_t;
 
 struct unary_t {
-    postfix_t *postfix;
-    ttype_t prefix;
     bool is_unary;
-    unary_t *unary;
+    ttype_t prefix;
+    union {
+        unary_t *unary;      /* is_unary: ( "!" | "~" | "-" ) unary */
+        postfix_t *postfix;  /* !is_unary: postfix */
+    };
 };
 
 typedef struct {
