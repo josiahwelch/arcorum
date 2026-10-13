@@ -9,6 +9,8 @@ add_executable(arcorum
     src/arcorum.c
     src/lexer.c
         include/ast.h
+        src/parser.c
+        include/parser.h
 )
 
 target_include_directories(arcorum PRIVATE
