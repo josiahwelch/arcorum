@@ -12,7 +12,6 @@ typedef struct {
     ssize_t pos;
 } parser_t;
 
-
 static uint8_t precedence(const token_t *token) {
     switch (token->type) {
         case TOK_PIPE_PIPE:                         return 1;
@@ -27,6 +26,15 @@ static uint8_t precedence(const token_t *token) {
         case TOK_PERCENT: case TOK_AMP:             return 5;
         default:                                    return 0;
     }
+}
+
+static token_t *peek(const parser_t *parser) {
+    return &parser->tokens[parser->pos];
+}
+
+static token_t *advance(parser_t *parser) {
+    if (peek(parser)->type != TOK_EOF) parser->pos++;
+    return peek(parser);
 }
 
 node_t *parse(token_t *tokens) {
