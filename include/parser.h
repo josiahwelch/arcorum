@@ -32,4 +32,6 @@ struct node_t {
     node_t *right;
 };
 
+node_t *parse(token_t *tokens);
+
 #endif //ARCORUM_PARSER_H

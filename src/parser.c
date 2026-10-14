@@ -7,6 +7,12 @@
 
 #include <parser.h>
 
+typedef struct {
+    token_t *tokens;
+    ssize_t pos;
+} parser_t;
+
+
 static uint8_t precedence(const token_t *token) {
     switch (token->type) {
         case TOK_PIPE_PIPE:                         return 1;
@@ -21,4 +27,9 @@ static uint8_t precedence(const token_t *token) {
         case TOK_PERCENT: case TOK_AMP:             return 5;
         default:                                    return 0;
     }
+}
+
+node_t *parse(token_t *tokens) {
+    node_t *nodes;
+    return nodes;
 }
