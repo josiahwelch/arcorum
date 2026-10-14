@@ -17,4 +17,19 @@
 #include <stdint.h>
 #include <lexer.h>
 
+typedef struct node_t node_t;
+
+typedef enum {
+    NODE_BINARY,
+    NODE_UNARY,
+    NODE_LEAF
+} node_type_t;
+
+struct node_t {
+    node_type_t type;
+    token_t *token;
+    node_t *left;
+    node_t *right;
+};
+
 #endif //ARCORUM_PARSER_H
