@@ -26,7 +26,7 @@ typedef struct {
 } field_param_t;
 
 typedef struct {
-    field_param_t param;
+    field_param_t *param;
     uint16_t param_count;
 } field_params_t;
 
@@ -169,12 +169,12 @@ typedef struct {
 } binary_t;
 
 struct expression_t {
-    binary_t binary;
+    binary_t *binary;
 };
 
 typedef struct {
-    field_params_t vars;
-    expression_t expression;
+    field_params_t *vars;
+    expression_t *expression;
     bool is_const;
 } var_decl_t;
 
