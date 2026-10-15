@@ -37,6 +37,15 @@ static token_t *advance(parser_t *parser) {
     return peek(parser);
 }
 
+static node_t *new_node(node_type_t type, token_t *token) {
+    node_t *node = calloc(1, sizeof(node_t));
+    if (node == NULL)
+        return NULL;
+    node->token = token;
+    node->type = type;
+    return node;
+}
+
 node_t *parse(token_t *tokens) {
     node_t *nodes;
     return nodes;
