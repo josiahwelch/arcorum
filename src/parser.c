@@ -46,6 +46,17 @@ static node_t *new_node(node_type_t type, token_t *token) {
     return node;
 }
 
+static node_t *parse_unary(parser_t *parser) {
+    token_t *current = peek(parser);
+    advance(parser);
+    if (current->type == TOK_MINUS || current->type == TOK_BANG || current->type == TOK_TILDE) {
+        node_t *node = new_node(NODE_UNARY, current);
+        node->left = parse_unary(parser);
+        return node;
+    }
+    return new_node(NODE_LEAF, current);
+}
+
 node_t *parse(token_t *tokens) {
     node_t *nodes;
     return nodes;
