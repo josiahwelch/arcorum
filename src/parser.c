@@ -73,6 +73,9 @@ static node_t *parse_expr(parser_t *parser, uint8_t min_prec) {
 }
 
 node_t *parse(token_t *tokens) {
-    node_t *nodes;
-    return nodes;
+    parser_t parser;
+    parser.tokens = tokens;
+    parser.pos = 0;
+    node_t *node = parse_expr(&parser, 0);
+    return node;
 }
