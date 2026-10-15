@@ -57,6 +57,21 @@ static node_t *parse_unary(parser_t *parser) {
     return new_node(NODE_LEAF, current);
 }
 
+static node_t *parse_expr(parser_t *parser, uint8_t min_prec) {
+    node_t *left = parse_unary(parser);
+    token_t *op = peek(parser);
+    while (precedence(op) >= min_prec && precedence(op)) {
+        advance(parser);
+        node_t *right = parse_expr(parser, precedence(op) + 1);
+        node_t *node = new_node(NODE_BINARY, op);
+        node->left = left;
+        node->right = right;
+        left = node;
+        op = peek(parser);
+    }
+    return left;
+}
+
 node_t *parse(token_t *tokens) {
     node_t *nodes;
     return nodes;
