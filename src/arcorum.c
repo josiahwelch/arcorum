@@ -6,6 +6,20 @@
  */
 
 #include <lexer.h>
+#include <parser.h>
+
+void print_ast(node_t *node) {
+    char *type_to_str[] = {
+        "NODE_BINARY",
+        "NODE_UNARY",
+        "NODE_LEAF"
+    };
+    printf("token(%u): \"%s\", type: %s", node->token->type, node->token->value, type_to_str[node->type]);
+    if (node->left != NULL)
+        print_ast(node->left);
+    if (node->right != NULL)
+        print_ast(node->right);
+}
 
 int main() {
     char src[] = "import core.math;\n"
@@ -49,6 +63,7 @@ int main() {
                  "\treturn point.x;\n"
                  "}";
     token_t *tokens = lex(src, strlen(src));
+    printf("LEXER OUTPUT:\n");
     for (int i = 0; tokens[i].value != NULL; i++) {
         printf("%zd:%zd ", tokens[i].line, tokens[i].col);
         switch (tokens[i].type) {
@@ -75,4 +90,5 @@ int main() {
                 break;
         }
     }
+    print_ast(parse(tokens));
 }
