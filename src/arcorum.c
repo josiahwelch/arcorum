@@ -14,7 +14,7 @@ void print_ast(node_t *node) {
         "NODE_UNARY",
         "NODE_LEAF"
     };
-    printf("token(%u): \"%s\", type: %s", node->token->type, node->token->value, type_to_str[node->type]);
+    printf("token(%u): \"%s\", type: %s\n", node->token->type, node->token->value, type_to_str[node->type]);
     if (node->left != NULL)
         print_ast(node->left);
     if (node->right != NULL)

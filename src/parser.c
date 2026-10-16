@@ -77,5 +77,7 @@ node_t *parse(token_t *tokens) {
     parser.tokens = tokens;
     parser.pos = 0;
     node_t *node = parse_expr(&parser, 0);
+    if (peek(&parser)->type != TOK_EOF)
+        return NULL;
     return node;
 }
