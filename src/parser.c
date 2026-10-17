@@ -12,6 +12,8 @@ typedef struct {
     ssize_t pos;
 } parser_t;
 
+static node_t *parse_expr(parser_t *parser, uint8_t min_prec);
+
 static uint8_t precedence(const token_t *token) {
     switch (token->type) {
         case TOK_PIPE_PIPE:                         return 1;
@@ -46,6 +48,27 @@ static node_t *new_node(node_type_t type, token_t *token) {
     return node;
 }
 
+static node_t *parse_primary(parser_t *parser, uint8_t min_prec) {
+    token_t *current = peek(parser);
+    advance(parser);
+    if (current->type == TOK_LPAREN) {
+        node_t *node = parse_expr(parser, min_prec);
+        if (peek(parser)->type == TOK_RPAREN)
+            printf("");
+
+    } else if ((current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING)
+        || current->type == TOK_TRUE || current->type == TOK_FALSE) {
+        // TOK_IDENTIFIER, TOK_INTEGER, TOK_FLOAT, TOK_CHAR, TOK_STRING
+
+
+
+
+    }
+    else
+        fprintf(stderr, "expected an expression, got ‘%s’ at %ld:%ld", current->value, current->line, current->col);
+    return NULL;
+}
+
 static node_t *parse_unary(parser_t *parser) {
     token_t *current = peek(parser);
     advance(parser);
@@ -77,7 +100,9 @@ node_t *parse(token_t *tokens) {
     parser.tokens = tokens;
     parser.pos = 0;
     node_t *node = parse_expr(&parser, 0);
-    if (peek(&parser)->type != TOK_EOF)
+    if (peek(&parser)->type != TOK_EOF) {
+        fprintf(stderr, "Unrecognized token!\n");
         return NULL;
+    }
     return node;
 }
