@@ -12,8 +12,10 @@ typedef struct {
     ssize_t pos;
 } parser_t;
 
+// Forward definitions
 static node_t *parse_expr(parser_t *parser, uint8_t min_prec);
 
+// Helper functions
 static uint8_t precedence(const token_t *token) {
     switch (token->type) {
         case TOK_PIPE_PIPE:                         return 1;
@@ -39,6 +41,26 @@ static token_t *advance(parser_t *parser) {
     return peek(parser);
 }
 
+static void err_msg(token_t *token, const char *exp_msg, bool got_msg) {
+    if (got_msg)
+        if (token->type == TOK_EOF)
+            fprintf(stderr, "expected %s, got end of file at %zd:%zd!\n", exp_msg, token->line, token->col);
+        else
+            fprintf(stderr, "expected %s, got '%s' at %zd:%zd!\n", exp_msg, token->value, token->line, token->col);
+    else
+        fprintf(stderr, "expected %s at %zd:%zd!\n", exp_msg, token->line, token->col);
+}
+
+static token_t *expect(parser_t *parser, ttype_t type, const char *exp_msg) {
+    token_t *token = peek(parser);
+    advance(parser);
+    if (token->type == type)
+        return token;
+    err_msg(token, exp_msg, true);
+    exit(1);
+    return NULL;
+}
+
 static node_t *new_node(node_type_t type, token_t *token) {
     node_t *node = calloc(1, sizeof(node_t));
     if (node == NULL) {
@@ -51,18 +73,14 @@ static node_t *new_node(node_type_t type, token_t *token) {
     return node;
 }
 
+// Parser functions
 static node_t *parse_primary(parser_t *parser) {
     token_t *current = peek(parser);
     advance(parser);
     if (current->type == TOK_LPAREN) {
         node_t *node = parse_expr(parser, 0);
-        if (peek(parser)->type == TOK_RPAREN) {
-            advance(parser);
-            return node;
-        }
-        fprintf(stderr, "expected ')' at %ld:%ld!\n", peek(parser)->line, peek(parser)->col);
-        exit(1);
-        return NULL;
+        expect(parser, TOK_RPAREN, "')'");
+        return node;
     }
     if ((current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING)
         || current->type == TOK_TRUE || current->type == TOK_FALSE) {
@@ -70,7 +88,7 @@ static node_t *parse_primary(parser_t *parser) {
         node_t *node = new_node(NODE_LEAF, current);
         return node;
     }
-    fprintf(stderr, "expected an expression, got ‘%s’ at %ld:%ld\n", current->value, current->line, current->col);
+    err_msg(current, "an expression", true);
     exit(1);
     return NULL;
 }
@@ -106,11 +124,6 @@ node_t *parse(token_t *tokens) {
     parser.tokens = tokens;
     parser.pos = 0;
     node_t *node = parse_expr(&parser, 0);
-    token_t *token = peek(&parser);
-    if (token->type != TOK_EOF) {
-        fprintf(stderr, "Unrecognized token, '%s' at %ld:%ld!\n", token->value, token->line, token->col);
-        exit(1);
-        return NULL;
-    }
+    expect(&parser, TOK_EOF, "end of file");
     return node;
 }
