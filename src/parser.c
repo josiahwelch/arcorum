@@ -41,8 +41,11 @@ static token_t *advance(parser_t *parser) {
 
 static node_t *new_node(node_type_t type, token_t *token) {
     node_t *node = calloc(1, sizeof(node_t));
-    if (node == NULL)
+    if (node == NULL) {
+        fprintf(stderr, "Out of memory!\n");
+        exit(1);
         return NULL;
+    }
     node->token = token;
     node->type = type;
     return node;
@@ -53,20 +56,22 @@ static node_t *parse_primary(parser_t *parser) {
     advance(parser);
     if (current->type == TOK_LPAREN) {
         node_t *node = parse_expr(parser, 0);
-        advance(parser);
-        if (peek(parser)->type == TOK_RPAREN)
+        if (peek(parser)->type == TOK_RPAREN) {
+            advance(parser);
             return node;
+        }
         fprintf(stderr, "expected ')' at %ld:%ld!\n", peek(parser)->line, peek(parser)->col);
+        exit(1);
         return NULL;
     }
     if ((current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING)
         || current->type == TOK_TRUE || current->type == TOK_FALSE) {
         // TOK_IDENTIFIER, TOK_INTEGER, TOK_FLOAT, TOK_CHAR, TOK_STRING
         node_t *node = new_node(NODE_LEAF, current);
-        advance(parser);
         return node;
     }
     fprintf(stderr, "expected an expression, got ‘%s’ at %ld:%ld\n", current->value, current->line, current->col);
+    exit(1);
     return NULL;
 }
 
@@ -101,8 +106,10 @@ node_t *parse(token_t *tokens) {
     parser.tokens = tokens;
     parser.pos = 0;
     node_t *node = parse_expr(&parser, 0);
-    if (peek(&parser)->type != TOK_EOF) {
-        fprintf(stderr, "Unrecognized token!\n");
+    token_t *token = peek(&parser);
+    if (token->type != TOK_EOF) {
+        fprintf(stderr, "Unrecognized token, '%s' at %ld:%ld!\n", token->value, token->line, token->col);
+        exit(1);
         return NULL;
     }
     return node;
