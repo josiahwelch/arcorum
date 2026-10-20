@@ -102,22 +102,58 @@ static node_t *parse_unary(parser_t *parser) {
         return node;
     }
     node_t *node = parse_primary(parser);
-    for (token_t *token = peek(parser); token->type == TOK_LBRACKET || token->type == TOK_DOT; token = peek(parser)) {
+    node_t *new;
+    for (token_t *token = peek(parser); token->type == TOK_LBRACKET || token->type == TOK_DOT || token->type == TOK_LPAREN; token = peek(parser)) {
         advance(parser);
-        if (token->type == TOK_LBRACKET) {
-            node_t *index = parse_expr(parser, 0);
-            expect(parser, TOK_RBRACKET, "']'");
-            node_t *new = new_node(NODE_INDEX, token);
-            new->left = node;
-            new->right = index;
-            node = new;
-        }
-        else { // It must be TOK_DOT...
-            token_t *id = expect(parser, TOK_IDENTIFIER, "an identifier");
-            node_t *new = new_node(NODE_MEMBER, token);
-            new->left = node;
-            new->right = new_node(NODE_LEAF, id);
-            node = new;
+        switch (token->type) {
+            case TOK_LBRACKET: {
+                node_t *index = parse_expr(parser, 0);
+                expect(parser, TOK_RBRACKET, "']'");
+                new = new_node(NODE_INDEX, token);
+                new->left = node;
+                new->right = index;
+                node = new;
+                break;
+            }
+            case TOK_DOT: {
+                token_t *id = expect(parser, TOK_IDENTIFIER, "an identifier");
+                new = new_node(NODE_MEMBER, token);
+                new->left = node;
+                new->right = new_node(NODE_LEAF, id);
+                node = new;
+                break;
+            }
+            case TOK_LPAREN: {
+                new = new_node(NODE_CALL, token);
+                new->left = node;
+                if (peek(parser)->type == TOK_RPAREN)
+                    advance(parser);
+                else {
+                    size_t size = 1;
+                    while (1) {
+                        node_t *arg = parse_expr(parser, 0);
+                        new->argc++;
+                        if (new->argc >= size) {
+                            size *= 2;
+                            new->args = realloc(new->args, sizeof(node_t *) * size);
+                            if (new->args == NULL) {
+                                fprintf(stderr, "Ran out of memory!\n");
+                                exit(1);
+                            }
+                        }
+                        new->args[new->argc - 1] = arg;
+                        if (peek(parser)->type != TOK_COMMA)
+                            break;
+                        advance(parser);
+                        if (peek(parser)->type == TOK_RPAREN)
+                            break;
+                    }
+                    expect(parser, TOK_RPAREN, "')'");
+                }
+                node = new;
+                break;
+            }
+            default: break;
         }
     }
     return node;

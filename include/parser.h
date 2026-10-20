@@ -24,7 +24,8 @@ typedef enum {
     NODE_UNARY,
     NODE_LEAF,
     NODE_INDEX,
-    NODE_MEMBER
+    NODE_MEMBER,
+    NODE_CALL
 } node_type_t;
 
 struct node_t {
@@ -32,6 +33,8 @@ struct node_t {
     token_t *token;
     node_t *left;
     node_t *right;
+    node_t **args;
+    size_t argc;
 };
 
 node_t *parse(token_t *tokens);
