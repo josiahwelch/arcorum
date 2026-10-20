@@ -48,36 +48,37 @@ static node_t *new_node(node_type_t type, token_t *token) {
     return node;
 }
 
-static node_t *parse_primary(parser_t *parser, uint8_t min_prec) {
+static node_t *parse_primary(parser_t *parser) {
     token_t *current = peek(parser);
     advance(parser);
     if (current->type == TOK_LPAREN) {
-        node_t *node = parse_expr(parser, min_prec);
+        node_t *node = parse_expr(parser, 0);
+        advance(parser);
         if (peek(parser)->type == TOK_RPAREN)
-            printf("");
-
-    } else if ((current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING)
+            return node;
+        fprintf(stderr, "expected ')' at %ld:%ld!\n", peek(parser)->line, peek(parser)->col);
+        return NULL;
+    }
+    if ((current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING)
         || current->type == TOK_TRUE || current->type == TOK_FALSE) {
         // TOK_IDENTIFIER, TOK_INTEGER, TOK_FLOAT, TOK_CHAR, TOK_STRING
-
-
-
-
+        node_t *node = new_node(NODE_LEAF, current);
+        advance(parser);
+        return node;
     }
-    else
-        fprintf(stderr, "expected an expression, got ‘%s’ at %ld:%ld", current->value, current->line, current->col);
+    fprintf(stderr, "expected an expression, got ‘%s’ at %ld:%ld\n", current->value, current->line, current->col);
     return NULL;
 }
 
 static node_t *parse_unary(parser_t *parser) {
     token_t *current = peek(parser);
-    advance(parser);
     if (current->type == TOK_MINUS || current->type == TOK_BANG || current->type == TOK_TILDE) {
+        advance(parser);
         node_t *node = new_node(NODE_UNARY, current);
         node->left = parse_unary(parser);
         return node;
     }
-    return new_node(NODE_LEAF, current);
+    return parse_primary(parser);
 }
 
 static node_t *parse_expr(parser_t *parser, uint8_t min_prec) {
