@@ -101,7 +101,26 @@ static node_t *parse_unary(parser_t *parser) {
         node->left = parse_unary(parser);
         return node;
     }
-    return parse_primary(parser);
+    node_t *node = parse_primary(parser);
+    for (token_t *token = peek(parser); token->type == TOK_LBRACKET || token->type == TOK_DOT; token = peek(parser)) {
+        advance(parser);
+        if (token->type == TOK_LBRACKET) {
+            node_t *index = parse_expr(parser, 0);
+            expect(parser, TOK_RBRACKET, "']'");
+            node_t *new = new_node(NODE_INDEX, token);
+            new->left = node;
+            new->right = index;
+            node = new;
+        }
+        else { // It must be TOK_DOT...
+            token_t *id = expect(parser, TOK_IDENTIFIER, "an identifier");
+            node_t *new = new_node(NODE_MEMBER, token);
+            new->left = node;
+            new->right = new_node(NODE_LEAF, id);
+            node = new;
+        }
+    }
+    return node;
 }
 
 static node_t *parse_expr(parser_t *parser, uint8_t min_prec) {

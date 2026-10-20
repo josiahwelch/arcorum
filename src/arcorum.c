@@ -12,7 +12,9 @@ void print_ast(node_t *node) {
     char *type_to_str[] = {
         "NODE_BINARY",
         "NODE_UNARY",
-        "NODE_LEAF"
+        "NODE_LEAF",
+        "NODE_INDEX",
+        "NODE_MEMBER"
     };
     printf("token(%u): \"%s\", type: %s\n", node->token->type, node->token->value, type_to_str[node->type]);
     if (node->left != NULL)

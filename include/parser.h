@@ -22,7 +22,9 @@ typedef struct node_t node_t;
 typedef enum {
     NODE_BINARY,
     NODE_UNARY,
-    NODE_LEAF
+    NODE_LEAF,
+    NODE_INDEX,
+    NODE_MEMBER
 } node_type_t;
 
 struct node_t {
