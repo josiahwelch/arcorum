@@ -26,7 +26,9 @@ typedef enum {
     NODE_INDEX,
     NODE_MEMBER,
     NODE_CALL,
-    NODE_CHAIN
+    NODE_CHAIN,
+    NODE_EXPR_STATEMENT,
+    NODE_BLOCK
 } node_type_t;
 
 struct node_t {

@@ -206,11 +206,28 @@ static node_t *parse_expr(parser_t *parser, uint8_t min_prec) {
     return left;
 }
 
+static node_t *parse_expr_statement(parser_t *parser) {
+    node_t *node = new_node(NODE_EXPR_STATEMENT, peek(parser));
+    if (node->token->type == TOK_BREAK || node->token->type == TOK_CONTINUE) {
+        advance(parser);
+        expect(parser, TOK_SEMICOLON, "';'");
+    } else if (node->token->type == TOK_RETURN) {
+        advance(parser);
+        if (peek(parser)->type != TOK_SEMICOLON && peek(parser)->type != TOK_EOF && peek(parser)->type != TOK_RBRACE)
+            node->left = parse_expr(parser, 0);
+        expect(parser, TOK_SEMICOLON, "';'");
+    } else {
+        node->left = parse_expr(parser, 0);
+        expect(parser, TOK_SEMICOLON, "';'");
+    }
+    return node;
+}
+
 node_t *parse(token_t *tokens) {
     parser_t parser;
     parser.tokens = tokens;
     parser.pos = 0;
-    node_t *node = parse_expr(&parser, 0);
+    node_t *node = parse_expr_statement(&parser);
     expect(&parser, TOK_EOF, "end of file");
     return node;
 }
