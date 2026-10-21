@@ -14,6 +14,7 @@ typedef struct {
 
 // Forward definitions
 static node_t *parse_expr(parser_t *parser, uint8_t min_prec);
+static node_t *parse_statement(parser_t *parser);
 
 // Helper functions
 static uint8_t precedence(const token_t *token) {
@@ -240,17 +241,26 @@ static node_t *parse_block(parser_t *parser) {
         if (peek(parser)->type == TOK_LBRACE)
             node->args[node->argc - 1] = parse_block(parser);
         else
-            node->args[node->argc - 1] = parse_expr_statement(parser);
+            node->args[node->argc - 1] = parse_statement(parser);
     }
     expect(parser, TOK_RBRACE, "'}'");
     return node;
+}
+
+static node_t *parse_statement(parser_t *parser) {
+    switch (peek(parser)->type) {
+        case TOK_LBRACE:
+            return parse_block(parser);
+        default:
+            return parse_expr_statement(parser);
+    }
 }
 
 node_t *parse(token_t *tokens) {
     parser_t parser;
     parser.tokens = tokens;
     parser.pos = 0;
-    node_t *node = parse_expr_statement(&parser);
+    node_t *node = parse_statement(&parser);
     expect(&parser, TOK_EOF, "end of file");
     return node;
 }
