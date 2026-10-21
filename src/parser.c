@@ -223,6 +223,29 @@ static node_t *parse_expr_statement(parser_t *parser) {
     return node;
 }
 
+static node_t *parse_block(parser_t *parser) {
+    node_t *node = new_node(NODE_BLOCK, peek(parser));
+    size_t size = 1;
+    expect(parser, TOK_LBRACE, "'{'");
+    while (peek(parser)->type != TOK_RBRACE && peek(parser)->type != TOK_EOF) {
+        node->argc++;
+        if (node->argc >= size) {
+            size *= 2;
+            node->args = realloc(node->args, sizeof(node_t *) * size);
+            if (node->args == NULL) {
+                fprintf(stderr, "Ran out of memory!\n");
+                exit(1);
+            }
+        }
+        if (peek(parser)->type == TOK_LBRACE)
+            node->args[node->argc - 1] = parse_block(parser);
+        else
+            node->args[node->argc - 1] = parse_expr_statement(parser);
+    }
+    expect(parser, TOK_RBRACE, "'}'");
+    return node;
+}
+
 node_t *parse(token_t *tokens) {
     parser_t parser;
     parser.tokens = tokens;
