@@ -9,13 +9,15 @@
 #include <parser.h>
 
 void print_ast(node_t *node) {
+    // Corresponds to node_type_t enum
     char *type_to_str[] = {
         "NODE_BINARY",
         "NODE_UNARY",
         "NODE_LEAF",
         "NODE_INDEX",
         "NODE_MEMBER",
-        "NODE_CALL"
+        "NODE_CALL",
+        "NODE_CHAIN"
     };
     if (node->type == NODE_CALL) {
         printf("token(%u): \"%s\", type: %s, args:", node->token->type, node->token->value, type_to_str[node->type]);

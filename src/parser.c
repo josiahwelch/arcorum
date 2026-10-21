@@ -165,9 +165,41 @@ static node_t *parse_expr(parser_t *parser, uint8_t min_prec) {
     while (precedence(op) >= min_prec && precedence(op)) {
         advance(parser);
         node_t *right = parse_expr(parser, precedence(op) + 1);
-        node_t *node = new_node(NODE_BINARY, op);
-        node->left = left;
-        node->right = right;
+        node_t *node = new_node(precedence(op) == 3 && precedence(peek(parser)) == 3 ? NODE_CHAIN : NODE_BINARY, op);
+        if (node->type == NODE_CHAIN) { //comparison
+            size_t size = 4;
+            node->args = calloc(1, sizeof(node_t *) * size);
+            node->ops  = calloc(1, sizeof(token_t *) * size);
+            if (node->args == NULL || node->ops == NULL) {
+                fprintf(stderr, "Ran out of memory!\n");
+                exit(1);
+            }
+            // First pair with operator
+            node->args[0] = left;
+            node->args[1] = right;
+            node->ops[0]  = op;
+            node->argc    = 2;
+            while (precedence(peek(parser)) == 3) {
+                token_t *next_op = peek(parser);
+                advance(parser);
+                node_t *arg = parse_expr(parser, 4);
+                if (node->argc >= size) {
+                    size *= 2;
+                    node->args = realloc(node->args, sizeof(node_t *) * size);
+                    node->ops = realloc(node->ops, sizeof(token_t *) * size);
+                    if (node->args == NULL || node->ops == NULL) {
+                        fprintf(stderr, "Ran out of memory!\n");
+                        exit(1);
+                    }
+                }
+                node->ops[node->argc - 1] = next_op;
+                node->args[node->argc] = arg;
+                node->argc++;
+            }
+        } else {
+            node->left = left;
+            node->right = right;
+        }
         left = node;
         op = peek(parser);
     }
