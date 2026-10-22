@@ -83,8 +83,7 @@ static node_t *parse_primary(parser_t *parser) {
         expect(parser, TOK_RPAREN, "')'");
         return node;
     }
-    if (current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING) {
-        // TOK_IDENTIFIER, TOK_INTEGER, TOK_FLOAT, TOK_CHAR, TOK_STRING
+    if (current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING) { // Includes all literals
         node_t *node = new_node(NODE_LEAF, current);
         return node;
     }
@@ -301,6 +300,21 @@ static node_t *parse_while(parser_t *parser) {
     node->left = parse_expr(parser, 0);
     expect(parser, TOK_RPAREN, "')'");
     node->right = parse_block(parser);
+    return node;
+}
+
+static node_t *parse_type(parser_t *parser) {
+    size_t ptr_depth = 0;
+    for(;peek(parser)->type == TOK_STAR; advance(parser))
+        ptr_depth++;
+    token_t *token = peek(parser);
+    if ((token->type < TOK_U8 || token->type > TOK_I64) && token->type != TOK_IDENTIFIER) { // Includes all types and identifier
+        err_msg(token,"a type", true);
+        exit(1);
+    }
+    node_t *node = new_node(NODE_TYPE, token);
+    node->argc = ptr_depth;
+    advance(parser);
     return node;
 }
 

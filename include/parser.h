@@ -32,7 +32,8 @@ typedef enum {
     NODE_IF,
     NODE_ELIF,
     NODE_ELSE,
-    NODE_WHILE
+    NODE_WHILE,
+    NODE_TYPE
 } node_type_t;
 
 struct node_t {
@@ -41,7 +42,7 @@ struct node_t {
     node_t *left;
     node_t *right;
     node_t **args;
-    size_t argc;
+    size_t argc; // Also means pointer depth in NODE_TYPE
     token_t **ops;
 };
 
