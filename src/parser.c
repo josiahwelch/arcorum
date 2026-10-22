@@ -295,12 +295,24 @@ static node_t *parse_if(parser_t *parser) {
     return node;
 }
 
+static node_t *parse_while(parser_t *parser) {
+    node_t *node = new_node(NODE_WHILE, peek(parser));
+    expect(parser, TOK_WHILE, "'while'");
+    expect(parser, TOK_LPAREN, "'('");
+    node->left = parse_expr(parser, 0);
+    expect(parser, TOK_RPAREN, "')'");
+    node->right = parse_block(parser);
+    return node;
+}
+
 static node_t *parse_statement(parser_t *parser) {
     switch (peek(parser)->type) {
         case TOK_LBRACE:
             return parse_block(parser);
         case TOK_IF:
             return parse_if(parser);
+        case TOK_WHILE:
+            return parse_while(parser);
         default:
             return parse_expr_statement(parser);
     }
