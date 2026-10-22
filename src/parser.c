@@ -287,7 +287,7 @@ static node_t *parse_if(parser_t *parser) {
         else if (peek(parser)->type == TOK_ELSE) {
             node->args[node->argc - 1] = parse_else(parser);
             if (peek(parser)->type == TOK_ELIF || peek(parser)->type == TOK_ELSE) {
-                err_msg(peek(parser), "if-else chains must end with else!\n", 1);
+                err_msg(peek(parser), "end of if-else chain", 1);
                 exit(1);
             }
         }
