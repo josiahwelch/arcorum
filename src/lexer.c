@@ -119,10 +119,6 @@ static ttype_t identifier() {
                 return TOK_ELIF;
             if (strncmp(tok_start, "enum", 4) == 0)
                 return TOK_ENUM;
-            if (strncmp(tok_start, "true", 4) == 0)
-                return TOK_TRUE;
-            if (strncmp(tok_start, "bool", 4) == 0)
-                return TOK_BOOL;
             break;
         case 5:
             if (strncmp(tok_start, "const", 5) == 0)
@@ -131,8 +127,6 @@ static ttype_t identifier() {
                 return TOK_WHILE;
             if (strncmp(tok_start, "break", 5) == 0)
                 return TOK_BREAK;
-            if (strncmp(tok_start, "false", 5) == 0)
-                return TOK_FALSE;
             break;
         case 6:
             if (strncmp(tok_start, "return", 6) == 0)
@@ -237,6 +231,8 @@ static ttype_t punctuation() {
             return TOK_COMMA;
         case '.':
             return TOK_DOT;
+        case '@':
+            return TOK_AT;
         default:
             return TOK_INVALID;
     }

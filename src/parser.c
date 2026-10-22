@@ -83,8 +83,7 @@ static node_t *parse_primary(parser_t *parser) {
         expect(parser, TOK_RPAREN, "')'");
         return node;
     }
-    if ((current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING)
-        || current->type == TOK_TRUE || current->type == TOK_FALSE) {
+    if (current->type >= TOK_IDENTIFIER && current->type <= TOK_STRING) {
         // TOK_IDENTIFIER, TOK_INTEGER, TOK_FLOAT, TOK_CHAR, TOK_STRING
         node_t *node = new_node(NODE_LEAF, current);
         return node;

@@ -39,8 +39,6 @@ typedef enum {
     TOK_STRUCT,
     TOK_ENUM,
     TOK_IMPORT,
-    TOK_TRUE,
-    TOK_FALSE,
 
     TOK_U8,
     TOK_U16,
@@ -50,7 +48,6 @@ typedef enum {
     TOK_I16,
     TOK_I32,
     TOK_I64,
-    TOK_BOOL,
 
     TOK_PLUS,
     TOK_MINUS,
@@ -92,7 +89,8 @@ typedef enum {
     TOK_COLON,
     TOK_SEMICOLON,
     TOK_COMMA,
-    TOK_DOT
+    TOK_DOT,
+    TOK_AT
 } ttype_t;
 
 typedef struct {

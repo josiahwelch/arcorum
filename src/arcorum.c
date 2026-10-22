@@ -23,10 +23,11 @@ void print_ast(node_t *node) {
         "NODE_IF",
         "NODE_ELIF",
         "NODE_ELSE",
+        "NODE_WHILE"
     };
     if (node->type == NODE_CALL) {
         printf("token(%u): \"%s\", type: %s, args:", node->token->type, node->token->value, type_to_str[node->type]);
-        for (int i = 0; i < node->argc; i++)
+        for (size_t i = 0; i < node->argc; i++)
             print_ast(node->args[i]);
     }
     printf("token(%u): \"%s\", type: %s\n", node->token->type, node->token->value, type_to_str[node->type]);
@@ -38,8 +39,8 @@ void print_ast(node_t *node) {
 
 int main() {
     char src[] = "import core.math;\n"
-                 "enum Color { red, green, blue };\n"
-                 "struct Point { x: i32, y: i32 };\n"
+                 "enum Color { red, green, blue }\n"
+                 "struct Point { x: i32, y: i32 }\n"
                  "fn add(a: i32, b: i32): i32 {\n"
                  "\treturn a + b;\n"
                  "}\n"
@@ -52,11 +53,10 @@ int main() {
                  "\tlet small: i16 = 6;\n"
                  "\tlet number: i32 = 7;\n"
                  "\tlet large: i64 = 8;\n"
-                 "\tlet enabled: bool = true;\n"
-                 "\tlet letter = 'a';\n"
-                 "\tlet message = \"yello\";\n"
-                 "\tlet decimal = 1.25;\n"
-                 "\tlet item = values[0];\n"
+                 "\tlet enabled: u8 = 1;\n"
+                 "\tlet letter: u8 = 'a';\n"
+                 "\tlet message: *u8 = \"yello\";\n"
+                 "\tlet item: i8 = values[0];\n"
                  "\tnumber = 1 + 2 - 3 * 4 / 5 % 6;\n"
                  "\tnumber += 1;\n"
                  "\tnumber -= 1;\n"
@@ -66,7 +66,7 @@ int main() {
                  "\tnumber--;\n"
                  "\tnumber = number << 1 >> 1;\n"
                  "\tnumber = number & 7 | 8 ^ ~9;\n"
-                 "\tif (number == 1 && number != 2 || !false) {\n"
+                 "\tif (number == 1 && number != 2 || !0) {\n"
                  "\tnumber = number < 10 + number <= 10;\n"
                  "\t} elif (number > 0 && number >= 0) {\n"
                  "\tconst fixed: i32 = number;\n"
@@ -74,7 +74,10 @@ int main() {
                  "\twhile (number) { break; }\n"
                  "\t}\n"
                  "\tfor (let i: i32 = 0; i < 10; i++) { continue; }\n"
-                 "\tlet bad = @;\n"
+                 "\tlet nothing: *u8 = @;\n"
+                 "\tlet ptr: *i32 = &number;\n"
+                 "\t*ptr = 9;\n"
+                 "\tlet first: u8, second: u16, third: i32;\n"
                  "\treturn point.x;\n"
                  "}";
     token_t *tokens = lex(src, strlen(src));
