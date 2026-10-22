@@ -231,8 +231,6 @@ static ttype_t punctuation() {
             return TOK_COMMA;
         case '.':
             return TOK_DOT;
-        case '@':
-            return TOK_AT;
         default:
             return TOK_INVALID;
     }

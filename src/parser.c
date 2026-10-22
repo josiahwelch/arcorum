@@ -95,7 +95,7 @@ static node_t *parse_primary(parser_t *parser) {
 
 static node_t *parse_unary(parser_t *parser) {
     token_t *current = peek(parser);
-    if (current->type == TOK_MINUS || current->type == TOK_BANG || current->type == TOK_TILDE) {
+    if (current->type == TOK_MINUS || current->type == TOK_BANG || current->type == TOK_TILDE || current->type == TOK_AMP || current->type == TOK_STAR) {
         advance(parser);
         node_t *node = new_node(NODE_UNARY, current);
         node->left = parse_unary(parser);

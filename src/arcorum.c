@@ -74,7 +74,7 @@ int main() {
                  "\twhile (number) { break; }\n"
                  "\t}\n"
                  "\tfor (let i: i32 = 0; i < 10; i++) { continue; }\n"
-                 "\tlet nothing: *u8 = @;\n"
+                 "\tlet nothing: *u8 = 0;\n"
                  "\tlet ptr: *i32 = &number;\n"
                  "\t*ptr = 9;\n"
                  "\tlet first: u8, second: u16, third: i32;\n"

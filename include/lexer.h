@@ -89,8 +89,7 @@ typedef enum {
     TOK_COLON,
     TOK_SEMICOLON,
     TOK_COMMA,
-    TOK_DOT,
-    TOK_AT
+    TOK_DOT
 } ttype_t;
 
 typedef struct {
