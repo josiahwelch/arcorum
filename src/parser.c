@@ -247,14 +247,65 @@ static node_t *parse_block(parser_t *parser) {
     return node;
 }
 
+static node_t *parse_else(parser_t *parser) {
+    node_t *node = new_node(NODE_ELSE, peek(parser));
+    expect(parser, TOK_ELSE, "'else'");
+    node->right = parse_block(parser);
+    return node;
+}
+
+static node_t *parse_elif(parser_t *parser) {
+    node_t *node = new_node(NODE_ELIF, peek(parser));
+    expect(parser, TOK_ELIF, "'elif'");
+    expect(parser, TOK_LPAREN, "'('");
+    node->left = parse_expr(parser, 0);
+    expect(parser, TOK_RPAREN, "')'");
+    node->right = parse_block(parser);
+    return node;
+}
+
+static node_t *parse_if(parser_t *parser) {
+    node_t *node = new_node(NODE_IF, peek(parser));
+    size_t size = 1;
+    expect(parser, TOK_IF, "'if'");
+    expect(parser, TOK_LPAREN, "'('");
+    node->left = parse_expr(parser, 0);
+    expect(parser, TOK_RPAREN, "')'");
+    node->right = parse_block(parser);
+    while (peek(parser)->type == TOK_ELIF || peek(parser)->type == TOK_ELSE) {
+        node->argc++;
+        if (node->argc >= size) {
+            size *= 2;
+            node->args = realloc(node->args, sizeof(node_t *) * size);
+            if (node->args == NULL) {
+                fprintf(stderr, "Ran out of memory!\n");
+                exit(1);
+            }
+        }
+        if (peek(parser)->type == TOK_ELIF)
+            node->args[node->argc - 1] = parse_elif(parser);
+        else if (peek(parser)->type == TOK_ELSE) {
+            node->args[node->argc - 1] = parse_else(parser);
+            if (peek(parser)->type == TOK_ELIF || peek(parser)->type == TOK_ELSE) {
+                err_msg(peek(parser), "if-else chains must end with else!\n", 1);
+                exit(1);
+            }
+        }
+    }
+    return node;
+}
+
 static node_t *parse_statement(parser_t *parser) {
     switch (peek(parser)->type) {
         case TOK_LBRACE:
             return parse_block(parser);
+        case TOK_IF:
+            return parse_if(parser);
         default:
             return parse_expr_statement(parser);
     }
 }
+
 
 node_t *parse(token_t *tokens) {
     parser_t parser;

@@ -19,7 +19,10 @@ void print_ast(node_t *node) {
         "NODE_CALL",
         "NODE_CHAIN",
         "NODE_EXPR_STATEMENT",
-        "NODE_BLOCK"
+        "NODE_BLOCK",
+        "NODE_IF",
+        "NODE_ELIF",
+        "NODE_ELSE",
     };
     if (node->type == NODE_CALL) {
         printf("token(%u): \"%s\", type: %s, args:", node->token->type, node->token->value, type_to_str[node->type]);

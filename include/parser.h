@@ -28,7 +28,10 @@ typedef enum {
     NODE_CALL,
     NODE_CHAIN,
     NODE_EXPR_STATEMENT,
-    NODE_BLOCK
+    NODE_BLOCK,
+    NODE_IF,
+    NODE_ELIF,
+    NODE_ELSE,
 } node_type_t;
 
 struct node_t {
