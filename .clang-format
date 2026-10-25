@@ -1,0 +1,42 @@
+# Arcus style (see docs/style.md)
+#   - tabs, 8 wide; 80 columns; 4-space continuation indent
+#   - K&R braces everywhere, including functions (brace on the same line)
+#   - return type on the same line as the function name
+#   - also (not enforced by clang-format): typedef'd types end in _t,
+#     declarations at the top of each function, `return x;` without
+#     parentheses, /* */ comments only, static prototypes at the top of
+#     each .c file, (void) for empty parameter lists
+BasedOnStyle: LLVM
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands: false
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Attach
+BreakBeforeTernaryOperators: false
+BreakStringLiterals: false
+ColumnLimit: 80
+ContinuationIndentWidth: 4
+DerivePointerAlignment: false
+IndentCaseLabels: false
+IndentWidth: 8
+MaxEmptyLinesToKeep: 1
+PointerAlignment: Right
+SortIncludes: Never
+SpaceBeforeParens: ControlStatements
+SpacesBeforeTrailingComments: 1
+TabWidth: 8
+UseTab: Always
