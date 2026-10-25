@@ -33,7 +33,9 @@ typedef enum {
     NODE_ELIF,
     NODE_ELSE,
     NODE_WHILE,
-    NODE_TYPE
+    NODE_TYPE,
+    NODE_LET,
+    NODE_CONST,
 } node_type_t;
 
 struct node_t {

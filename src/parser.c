@@ -318,6 +318,39 @@ static node_t *parse_type(parser_t *parser) {
     return node;
 }
 
+static node_t *parse_var_decl(parser_t *parser) {
+    node_t *node;
+    if (peek(parser)->type; == TOK_LET)
+        node = new_node(NODE_LET, peek(parser));
+    else
+        node = new_node(NODE_CONST, peek(parser));
+    node_t *type = parse_type(parser);
+    size_t size = 1;
+    while (peek(parser)->type == TOK_COMMA) {
+        advance(parser);
+        node->argc++;
+        if (node->argc >= size) {
+            size *= 2;
+            node->args = realloc(node->args, sizeof(node_t *) * size);
+            if (node->args == NULL) {
+                fprintf(stderr, "Ran out of memory!\n");
+                exit(1);
+            }
+        }
+        node->args[node->argc - 1] = type; // So that the first type gets included
+        type = parse_type(parser);
+    }
+    if (!node->argc) {
+        if (peek(parser)->type == TOK_EQUAL) {
+            advance(parser);
+            node->right = parse_expr(parser, 4);
+        }
+        node->left = type;
+    }
+    expect(parser, TOK_SEMICOLON, "';'");
+    return node;
+}
+
 static node_t *parse_statement(parser_t *parser) {
     switch (peek(parser)->type) {
         case TOK_LBRACE:
@@ -326,6 +359,8 @@ static node_t *parse_statement(parser_t *parser) {
             return parse_if(parser);
         case TOK_WHILE:
             return parse_while(parser);
+        case TOK_LET: case TOK_CONST:
+            return parse_var_decl(parser);
         default:
             return parse_expr_statement(parser);
     }
