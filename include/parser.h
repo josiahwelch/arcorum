@@ -37,6 +37,7 @@ typedef enum {
 	NODE_TYPE,
 	NODE_VAR,
 	NODE_VAR_TYPE,
+	NODE_ASSIGN,
 } node_type_t;
 
 struct node_t {
