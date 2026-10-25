@@ -25,8 +25,8 @@ void print_ast(node_t *node) {
         "NODE_ELSE",
         "NODE_WHILE",
         "NODE_TYPE",
-        "NODE_LET",
-        "NODE_CONST",
+        "NODE_VAR",
+        "NODE_VAR_TYPE",
     };
     if (node->type == NODE_CALL) {
         printf("token(%u): \"%s\", type: %s, args:", node->token->type, node->token->value, type_to_str[node->type]);

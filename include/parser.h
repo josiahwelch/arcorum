@@ -34,8 +34,8 @@ typedef enum {
     NODE_ELSE,
     NODE_WHILE,
     NODE_TYPE,
-    NODE_LET,
-    NODE_CONST,
+    NODE_VAR,
+    NODE_VAR_TYPE,
 } node_type_t;
 
 struct node_t {

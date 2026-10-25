@@ -42,7 +42,7 @@ static token_t *advance(parser_t *parser) {
     return peek(parser);
 }
 
-static void err_msg(token_t *token, const char *exp_msg, bool got_msg) {
+static void err_msg(const token_t *token, const char *exp_msg, bool got_msg) {
     if (got_msg)
         if (token->type == TOK_EOF)
             fprintf(stderr, "expected %s, got end of file at %zd:%zd!\n", exp_msg, token->line, token->col);
@@ -318,17 +318,20 @@ static node_t *parse_type(parser_t *parser) {
     return node;
 }
 
+static node_t *parse_var_type(parser_t *parser) {
+    node_t *node = new_node(NODE_VAR_TYPE, expect(parser, TOK_IDENTIFIER, "variable name"));
+    expect(parser, TOK_COLON, "':'");
+    node->left = parse_type(parser);
+    return node;
+}
+
 static node_t *parse_var_decl(parser_t *parser) {
-    node_t *node;
-    if (peek(parser)->type; == TOK_LET)
-        node = new_node(NODE_LET, peek(parser));
-    else
-        node = new_node(NODE_CONST, peek(parser));
-    node_t *type = parse_type(parser);
+    node_t *node = new_node(NODE_VAR, peek(parser));
+    advance(parser);
     size_t size = 1;
-    while (peek(parser)->type == TOK_COMMA) {
-        advance(parser);
-        node->argc++;
+    bool done = false;
+    while (!done) {
+        node->argc += 1;
         if (node->argc >= size) {
             size *= 2;
             node->args = realloc(node->args, sizeof(node_t *) * size);
@@ -337,16 +340,26 @@ static node_t *parse_var_decl(parser_t *parser) {
                 exit(1);
             }
         }
-        node->args[node->argc - 1] = type; // So that the first type gets included
-        type = parse_type(parser);
-    }
-    if (!node->argc) {
-        if (peek(parser)->type == TOK_EQUAL) {
-            advance(parser);
-            node->right = parse_expr(parser, 4);
+        node->args[node->argc - 1] = parse_var_type(parser);
+        switch (peek(parser)->type) {
+            case TOK_COMMA:
+                advance(parser);
+                break;
+            case TOK_EQUAL:
+                done = true;
+                if (node->argc > 1)
+                    expect(parser, TOK_SEMICOLON, "';'");
+                advance(parser);
+                break;
+            case TOK_SEMICOLON:
+                advance(parser);
+                return node;
+            default:
+                expect(parser, TOK_SEMICOLON, "'=', (',' type), or ';'");
+                break;
         }
-        node->left = type;
     }
+    node->left = parse_expr(parser, 0);
     expect(parser, TOK_SEMICOLON, "';'");
     return node;
 }
