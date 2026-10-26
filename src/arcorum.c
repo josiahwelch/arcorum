@@ -14,23 +14,24 @@ static void print_ast(node_t *node);
 static void print_ast(node_t *node) {
 	/* Corresponds to node_type_t. */
 	static const char *type_to_str[] = {
-	    "NODE_BINARY",
-	    "NODE_UNARY",
-	    "NODE_LEAF",
-	    "NODE_INDEX",
-	    "NODE_MEMBER",
-	    "NODE_CALL",
-	    "NODE_CHAIN",
-	    "NODE_EXPR_STATEMENT",
-	    "NODE_BLOCK",
-	    "NODE_IF",
-	    "NODE_ELIF",
-	    "NODE_ELSE",
-	    "NODE_WHILE",
-	    "NODE_TYPE",
-	    "NODE_VAR",
-	    "NODE_VAR_TYPE",
+		"NODE_BINARY",
+		"NODE_UNARY",
+		"NODE_LEAF",
+		"NODE_INDEX",
+		"NODE_MEMBER",
+		"NODE_CALL",
+		"NODE_CHAIN",
+		"NODE_EXPR_STATEMENT",
+		"NODE_BLOCK",
+		"NODE_IF",
+		"NODE_ELIF",
+		"NODE_ELSE",
+		"NODE_WHILE",
+		"NODE_TYPE",
+		"NODE_VAR",
+		"NODE_VAR_TYPE",
 		"NODE_ASSIGN",
+		"NODE_FOR",
 	};
 	size_t i;
 
@@ -78,11 +79,11 @@ int main(void) {
 		     "\tnumber = number << 1 >> 1;\n"
 		     "\tnumber = number & 7 | 8 ^ ~9;\n"
 		     "\tif (number == 1 && number != 2 || !0) {\n"
-		     "\tnumber = number < 10 + number <= 10;\n"
+		     "\t\tnumber = number < 10 + number <= 10;\n"
 		     "\t} elif (number > 0 && number >= 0) {\n"
-		     "\tconst fixed: i32 = number;\n"
+		     "\t\tconst fixed: i32 = number;\n"
 		     "\t} else {\n"
-		     "\twhile (number) { break; }\n"
+		     "\t\twhile (number) { break; }\n"
 		     "\t}\n"
 		     "\tfor (let i: i32 = 0; i < 10; i++) { continue; }\n"
 		     "\tlet nothing: *u8 = 0;\n"
@@ -91,7 +92,6 @@ int main(void) {
 		     "\tlet first: u8, second: u16, third: i32;\n"
 		     "\treturn point.x;\n"
 		     "}";
-
 	token_t *tokens;
 	int i;
 

@@ -33,6 +33,7 @@ static node_t *parse_while(parser_t *parser);
 static node_t *parse_type(parser_t *parser);
 static node_t *parse_var_type(parser_t *parser);
 static node_t *parse_var_decl(parser_t *parser);
+static node_t *parse_for(parser_t *parser);
 static node_t *parse_statement(parser_t *parser);
 
 /* Helper functions. */
@@ -476,6 +477,50 @@ static node_t *parse_var_decl(parser_t *parser) {
 	return node;
 }
 
+static node_t *parse_for(parser_t *parser) {
+	node_t *node;
+	node_t *node_mod;
+	int i;
+
+	node = new_node(NODE_FOR, peek(parser));
+	expect(parser, TOK_FOR, "'for'");
+	expect(parser, TOK_LPAREN, "'('");
+	node->args = calloc(3, sizeof(node_t *));
+	node->argc = 3;
+	if (node->args == NULL) {
+		fprintf(stderr, "Out of memory!\n");
+		exit(1);
+		return NULL;
+	}
+	for (i = 0; i < 2; i++) {
+		if (peek(parser)->type == TOK_SEMICOLON)
+			advance(parser);
+		else
+			node->args[i] = parse_statement(parser);
+	}
+	/* See parse_expr_statement. */
+	if (peek(parser)->type != TOK_RPAREN) {
+		node_mod = new_node(NODE_EXPR_STATEMENT, peek(parser));
+		node_mod->left = parse_expr(parser, 0);
+		if (peek(parser)->type >= TOK_EQUAL &&
+		    peek(parser)->type <= TOK_SLASH_EQUAL) {
+			node_mod->type = NODE_ASSIGN;
+			node_mod->token = peek(parser);
+			advance(parser);
+			node_mod->right = parse_expr(parser, 0);
+		} else if (peek(parser)->type == TOK_INC ||
+		    peek(parser)->type == TOK_DEC) {
+			node_mod->type = NODE_ASSIGN;
+			node_mod->token = peek(parser);
+			advance(parser);
+		}
+		node->args[2] = node_mod;
+	}
+	expect(parser, TOK_RPAREN, "')'");
+	node->left = parse_block(parser);
+	return node;
+}
+
 static node_t *parse_statement(parser_t *parser) {
 	switch (peek(parser)->type) {
 	case TOK_LBRACE:
@@ -487,6 +532,8 @@ static node_t *parse_statement(parser_t *parser) {
 	case TOK_LET:
 	case TOK_CONST:
 		return parse_var_decl(parser);
+	case TOK_FOR:
+		return parse_for(parser);
 	default:
 		return parse_expr_statement(parser);
 	}
