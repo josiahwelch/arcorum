@@ -28,6 +28,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: false
 BreakStringLiterals: false
+Cpp11BracedListStyle: false
 ColumnLimit: 80
 ContinuationIndentWidth: 4
 DerivePointerAlignment: false

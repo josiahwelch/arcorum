@@ -6,16 +6,16 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
 add_executable(arcorum
-    src/arcorum.c
-    src/lexer.c
-        include/ast.h
-        src/parser.c
-        include/parser.h
+	src/arcorum.c
+	src/lexer.c
+	include/ast.h
+	src/parser.c
+	include/parser.h
 )
 
 target_include_directories(arcorum PRIVATE
-    include
-    /usr/local/include
+	include
+	/usr/local/include
 )
 
 target_link_directories(arcorum PRIVATE /usr/local/lib)

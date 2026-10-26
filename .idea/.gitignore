@@ -10,3 +10,5 @@
 /dataSources.local.xml
 # Per-user Markdown preview provider choice (crashes with the experimental Compose renderer)
 /markdown.xml
+# Per-user editor plugin state
+/claudeCodeEditorTabs.xml
