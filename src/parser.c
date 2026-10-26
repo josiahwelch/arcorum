@@ -149,8 +149,8 @@ static node_t *parse_unary(parser_t *parser) {
 	}
 	node = parse_primary(parser);
 	for (token = peek(parser); token->type == TOK_LBRACKET ||
-	     token->type == TOK_DOT || token->type == TOK_LPAREN;
-	     token = peek(parser)) {
+	    token->type == TOK_DOT || token->type == TOK_LPAREN;
+	    token = peek(parser)) {
 		advance(parser);
 		switch (token->type) {
 		case TOK_LBRACKET:
@@ -284,6 +284,18 @@ static node_t *parse_expr_statement(parser_t *parser) {
 		expect(parser, TOK_SEMICOLON, "';'");
 	} else {
 		node->left = parse_expr(parser, 0);
+		if (peek(parser)->type >= TOK_EQUAL &&
+		    peek(parser)->type <= TOK_SLASH_EQUAL) {
+			node->type = NODE_ASSIGN;
+			node->token = peek(parser);
+			advance(parser);
+			node->right = parse_expr(parser, 0);
+		} else if (peek(parser)->type == TOK_INC ||
+		    peek(parser)->type == TOK_DEC) {
+			node->type = NODE_ASSIGN;
+			node->token = peek(parser);
+			advance(parser);
+		}
 		expect(parser, TOK_SEMICOLON, "';'");
 	}
 	return node;
