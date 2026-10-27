@@ -40,6 +40,10 @@ typedef enum {
 	NODE_ASSIGN,
 	NODE_FOR,
 	NODE_FN,
+	NODE_STRUCT,
+	NODE_ENUM,
+	NODE_IMPORT,
+	NODE_IMPORT_SRC,
 } node_type_t;
 
 struct node_t {

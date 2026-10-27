@@ -545,7 +545,7 @@ static node_t *parse_fn(parser_t *parser) {
 	bool done;
 
 	node = new_node(NODE_FN, advance(parser));
-	advance(parser);
+	expect(parser, TOK_IDENTIFIER, "an identifier");
 	expect(parser, TOK_LPAREN, "'('");
 	size = 1;
 	done = false;
@@ -576,6 +576,134 @@ static node_t *parse_fn(parser_t *parser) {
 		node->left = parse_type(parser);
 	}
 	node->right = parse_block(parser);
+	return node;
+}
+
+static node_t *parse_struct(parser_t *parser) {
+	node_t *node;
+	size_t size;
+	bool done;
+
+	node = new_node(NODE_STRUCT, advance(parser));
+	expect(parser, TOK_IDENTIFIER, "an identifier");
+	expect(parser, TOK_LBRACE, "'{'");
+	size = 1;
+	done = false;
+	while (!done) {
+		node->argc += 1;
+		if (node->argc >= size) {
+			size *= 2;
+			node->args =
+			    realloc(node->args, sizeof(node_t *) * size);
+			if (node->args == NULL) {
+				fprintf(stderr, "Ran out of memory!\n");
+				exit(1);
+			}
+		}
+		node->args[node->argc - 1] = parse_var_type(parser);
+		if (peek(parser)->type == TOK_COMMA)
+			advance(parser);
+		else {
+			expect(parser, TOK_RBRACE, "'}'");
+			break;
+		}
+	}
+	return node;
+}
+
+static node_t *parse_enum(parser_t *parser) {
+	node_t *node;
+	size_t size;
+
+	node = new_node(NODE_ENUM, advance(parser));
+	expect(parser, TOK_IDENTIFIER, "an identifier");
+	expect(parser, TOK_LBRACE, "'{'");
+	size = 1;
+	for (;;) {
+		node->argc += 1;
+		if (node->argc >= size) {
+			size *= 2;
+			node->args =
+			    realloc(node->args, sizeof(node_t *) * size);
+			if (node->args == NULL) {
+				fprintf(stderr, "Ran out of memory!\n");
+				exit(1);
+			}
+		}
+		node->args[node->argc - 1] = new_node(NODE_LEAF,
+		    expect(parser, TOK_IDENTIFIER, "an identifier"));
+		if (peek(parser)->type == TOK_COMMA)
+			advance(parser);
+		else {
+			expect(parser, TOK_RBRACE, "'}'");
+			break;
+		}
+	}
+	return node;
+}
+
+static node_t *parse_import_src(parser_t *parser) {
+	node_t *node;
+	size_t size;
+
+	node = new_node(NODE_IMPORT_SRC, peek(parser));
+	size = 1;
+	if (peek(parser)->type == TOK_STRING) {
+		node->args = calloc(1, sizeof(node_t *));
+		if (node->args == NULL) {
+			fprintf(stderr, "Ran out of memory!\n");
+			exit(1);
+		}
+		node->argc = 1;
+		node->args[0] = new_node(NODE_LEAF, peek(parser));
+		advance(parser);
+	} else
+		for (;;) {
+			node->argc += 1;
+			if (node->argc >= size) {
+				size *= 2;
+				node->args = realloc(node->args,
+				    sizeof(node_t *) * size);
+				if (node->args == NULL) {
+					fprintf(stderr, "Ran out of memory!\n");
+					exit(1);
+				}
+			}
+			node->args[node->argc - 1] = new_node(NODE_LEAF,
+			    expect(parser, TOK_IDENTIFIER, "an identifier"));
+			if (peek(parser)->type == TOK_DOT)
+				advance(parser);
+			else
+				break;
+		}
+	return node;
+}
+
+static node_t *parse_import(parser_t *parser) {
+	node_t *node;
+	size_t size;
+
+	node = new_node(NODE_IMPORT, advance(parser));
+	size = 1;
+	for (;;) {
+		node->argc += 1;
+		if (node->argc >= size) {
+			size *= 2;
+			node->args =
+			    realloc(node->args, sizeof(node_t *) * size);
+			if (node->args == NULL) {
+				fprintf(stderr, "Ran out of memory!\n");
+				exit(1);
+			}
+		}
+		node->args[node->argc - 1] = parse_import_src(parser);
+		if (peek(parser)->type == TOK_COMMA)
+			advance(parser);
+		else {
+			expect(parser, TOK_SEMICOLON, "';'");
+			break;
+		}
+	}
 	return node;
 }
 

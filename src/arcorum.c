@@ -33,6 +33,10 @@ static void print_ast(node_t *node) {
 		"NODE_ASSIGN",
 		"NODE_FOR",
 		"NODE_FN",
+		"NODE_STRUCT",
+		"NODE_ENUM",
+		"NODE_IMPORT",
+		"NODE_IMPORT_SRC",
 	};
 	size_t i;
 
