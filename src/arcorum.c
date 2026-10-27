@@ -32,6 +32,7 @@ static void print_ast(node_t *node) {
 		"NODE_VAR_TYPE",
 		"NODE_ASSIGN",
 		"NODE_FOR",
+		"NODE_FN",
 	};
 	size_t i;
 
