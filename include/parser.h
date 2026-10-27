@@ -44,6 +44,7 @@ typedef enum {
 	NODE_ENUM,
 	NODE_IMPORT,
 	NODE_IMPORT_SRC,
+	NODE_PROGRAM
 } node_type_t;
 
 struct node_t {

@@ -37,6 +37,7 @@ static void print_ast(node_t *node) {
 		"NODE_ENUM",
 		"NODE_IMPORT",
 		"NODE_IMPORT_SRC",
+		"NODE_PROGRAM"
 	};
 	size_t i;
 

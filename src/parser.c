@@ -35,6 +35,12 @@ static node_t *parse_var_type(parser_t *parser);
 static node_t *parse_var_decl(parser_t *parser);
 static node_t *parse_for(parser_t *parser);
 static node_t *parse_statement(parser_t *parser);
+static node_t *parse_fn(parser_t *parser);
+static node_t *parse_struct(parser_t *parser);
+static node_t *parse_enum(parser_t *parser);
+static node_t *parse_import_src(parser_t *parser);
+static node_t *parse_import(parser_t *parser);
+static node_t *parse_program(parser_t *parser);
 
 /* Helper functions. */
 static uint8_t precedence(const token_t *token) {
@@ -702,6 +708,57 @@ static node_t *parse_import(parser_t *parser) {
 		else {
 			expect(parser, TOK_SEMICOLON, "';'");
 			break;
+		}
+	}
+	return node;
+}
+
+static node_t *parse_program(parser_t *parser) {
+	node_t *node;
+	size_t size;
+	bool done;
+
+	node = new_node(NODE_PROGRAM, peek(parser));
+	size = 1;
+	done = false;
+	while (!done) {
+		node->argc += 1;
+		if (node->argc >= size) {
+			size *= 2;
+			node->args =
+			    realloc(node->args, sizeof(node_t *) * size);
+			if (node->args == NULL) {
+				fprintf(stderr, "Ran out of memory!\n");
+				exit(1);
+			}
+		}
+		switch (peek(parser)->type) {
+		case TOK_FN:
+			node->args[node->argc - 1] = parse_fn(parser);
+			break;
+		case TOK_STRUCT:
+			node->args[node->argc - 1] = parse_struct(parser);
+			break;
+		case TOK_ENUM:
+			node->args[node->argc - 1] = parse_enum(parser);
+			break;
+		case TOK_IMPORT:
+			node->args[node->argc - 1] = parse_import(parser);
+			break;
+		case TOK_LET:
+		case TOK_CONST:
+			node->args[node->argc - 1] = parse_var_decl(parser);
+			break;
+		case TOK_EOF:
+			node->argc--; /* Since it gets incremented anyways. */
+			done = true;
+			break;
+		default:
+			err_msg(peek(parser),
+			    "an import statement or an enumerated type, struct, function, or variable declaration",
+			    true);
+			exit(1);
+			return NULL;
 		}
 	}
 	return node;
