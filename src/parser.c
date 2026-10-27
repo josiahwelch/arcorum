@@ -770,7 +770,7 @@ node_t *parse(token_t *tokens) {
 
 	parser.tokens = tokens;
 	parser.pos = 0;
-	node = parse_statement(&parser);
+	node = parse_program(&parser);
 	expect(&parser, TOK_EOF, "end of file");
 	return node;
 }

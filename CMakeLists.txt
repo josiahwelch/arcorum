@@ -8,8 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 add_executable(arcorum
 	src/arcorum.c
 	src/lexer.c
-	include/ast.h
-	src/parser.c
+        src/parser.c
 	include/parser.h
 )
 
